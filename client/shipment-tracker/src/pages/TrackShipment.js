@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const ShipmentTracker = () => {
+const TrackShipment = () => {
   const [trackingNumber, setTrackingNumber] = useState('');
   const [shipmentData, setShipmentData] = useState(null);
   const [error, setError] = useState(null);
@@ -57,4 +57,4 @@ const ShipmentTracker = () => {
   );
 };
 
-export default ShipmentTracker;
+export default TrackShipment;

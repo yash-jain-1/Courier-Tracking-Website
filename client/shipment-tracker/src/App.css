@@ -63,3 +63,18 @@ body {
   color: #ff4d4d;
   text-align: center;
 }
+
+/* App.css */
+
+.App {
+  font-family: Arial, sans-serif;
+}
+
+.main-content {
+  padding: 20px;
+  margin-top: 60px; /* Space for NavBar */
+}
+
+h1, h2, h3 {
+  color: #333;
+}
