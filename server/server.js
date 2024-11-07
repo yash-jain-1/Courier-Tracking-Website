@@ -9,14 +9,12 @@ const app = express();
 app.use(bodyParser.json());
 
 MONGO_URI = "mongodb+srv://yashjainstudy:dTnOPPfBqGs6maM2@courier.gv4ed.mongodb.net/?retryWrites=true&w=majority&appName=Courier";
-// Debug: Check if MONGO_URI is being read correctly
-// console.log("MongoDB URI:", process.env.MONGO_URI);
-
+// TODO: Remove the connection string from the source code and move it to an environment variable
 mongoose.connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => console.log("MongoDB connected"))
-    .catch(err => console.log("MongoDB connection error:", err));
+    dbName: 'test',
+  })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((error) => console.error('MongoDB connection error:', error));
 
 app.get('/', (req, res) => {
     res.send('Hello World');
