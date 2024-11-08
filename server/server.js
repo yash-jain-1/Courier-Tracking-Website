@@ -4,69 +4,95 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const Shipment = require('./models/Shipment');
+const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/adminRoutes');  // Correct import
 
 const app = express();
-app.use(bodyParser.json());
 
+app.use(bodyParser.json());
 
 const cors = require('cors');
 app.use(cors({
-    origin: 'http://localhost:3000'
+  origin: 'http://localhost:3000', // Your frontend URL
+  credentials: true
 }));
 
-MONGO_URI = "mongodb+srv://yashjainstudy:dTnOPPfBqGs6maM2@courier.gv4ed.mongodb.net/?retryWrites=true&w=majority&appName=Courier";
+// MongoDB connection string (ensure to handle this securely)
+const MONGO_URI = "mongodb+srv://yashjainstudy:dTnOPPfBqGs6maM2@courier.gv4ed.mongodb.net/?retryWrites=true&w=majority&appName=Courier";
 // TODO: Remove the connection string from the source code and move it to an environment variable
 mongoose.connect(MONGO_URI, {
-    dbName: 'test',
+  dbName: 'test',
 })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch((error) => console.error('MongoDB connection error:', error));
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((error) => console.error('MongoDB connection error:', error));
 
 app.get('/', (req, res) => {
-    res.send('Hello World');
+  res.send('Hello World');
 });
 
+// Use the admin routes
+app.use('/api/admin', adminRoutes);
+
+// Use the auth routes
+app.use('/api/auth', authRoutes);
+
+// Add a new shipment
 app.post('/api/shipments', async (req, res) => {
-    try {
-        const shipment = new Shipment(req.body);
-        await shipment.save();
-        res.status(201).send(shipment);
-    } catch (error) {
-        res.status(400).send(error);
-    }
+  try {
+    const shipment = new Shipment({
+      trackingNumber: req.body.trackingNumber,
+      status: req.body.status,
+      location: req.body.location,
+      updates: [] // Initialize empty updates array
+    });
+    await shipment.save();
+    res.status(201).send(shipment);
+  } catch (error) {
+    res.status(400).send(error);
+  }
 });
 
+// Fetch a particular shipment by tracking number
 app.get('/api/shipments/:trackingNumber', async (req, res) => {
-    try {
-        const shipment = await Shipment.findOne({ trackingNumber: req.params.trackingNumber });
-        if (!shipment) return res.status(404).send("Shipment not found");
-        res.send(shipment);
-    } catch (error) {
-        res.status(500).send(error);
-    }
+  try {
+    const shipment = await Shipment.findOne({ trackingNumber: req.params.trackingNumber });
+    if (!shipment) return res.status(404).send("Shipment not found");
+    res.send(shipment);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
+// Update a shipment with new status
 app.post('/api/shipments/:trackingNumber/updates', async (req, res) => {
-    try {
-        const shipment = await Shipment.findOne({ trackingNumber: req.params.trackingNumber });
-        if (!shipment) return res.status(404).send("Shipment not found");
+  try {
+    const { trackingNumber } = req.params;
+    const { status, updateData } = req.body;
 
-        // Push new update into the `updates` array
-        shipment.updates.push({
-            date: req.body.date,
-            time: req.body.time,
-            location: req.body.location,
-            activity: req.body.activity,
-            remarks: req.body.remarks
-        });
-
-        // Save the updated shipment
-        await shipment.save();
-
-        res.send(shipment);
-    } catch (error) {
-        res.status(400).send(error);
+    // Find the shipment by tracking number
+    const shipment = await Shipment.findOne({ trackingNumber });
+    if (!shipment) {
+      return res.status(404).json({ message: "Shipment not found" });
     }
+
+    // Update the shipment's status
+    if (status) {
+      shipment.status = status;
+    }
+
+    // Add the update to the updates array
+    if (updateData) {
+      shipment.updates.push(updateData);
+    }
+
+    // Save the updated shipment document
+    await shipment.save();
+
+    res.status(200).json({ message: "Shipment updated successfully", shipment });
+  } catch (error) {
+    console.error("Error updating shipment:", error);
+    res.status(500).json({ message: "Failed to update shipment" });
+  }
 });
 
 // Define port

@@ -4,7 +4,7 @@ const updateSchema = new mongoose.Schema({
   date: { type: Date, required: true },
   time: { type: String, required: true }, // storing time as a string for flexibility, or you could use Date with time info
   location: { type: String, required: true },
-  activity: { type: String, required: true },
+  status: { type: String, required: true },
   remarks: { type: String, required: false }
 });
 
