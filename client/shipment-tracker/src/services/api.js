@@ -14,11 +14,12 @@ export const adminLogin = (credentials) => {
 };
 
 // Add a new shipment
-export const addShipment = (shipmentData) => {
-  return axios.post(`${API_URL}/admin/shipments`, shipmentData);
-};
+export const addShipment = (shipmentData) => axios.post(`${API_URL}/shipments`, shipmentData);
 
-// Update shipment
-export const updateShipment = (trackingNumber, updateData) => {
-  return axios.post(`${API_URL}/admin/shipments/${trackingNumber}/updates`, updateData);
+// Update shipment details (add update)
+export const updateShipment = (trackingNumber, updateData) => axios.post(`${API_URL}/shipments/${trackingNumber}/updates`, updateData);
+
+// Fetch all shipments for admin
+export const fetchAllShipments = () => {
+  return axios.get(`${API_URL}/admin/shipments`);
 };
