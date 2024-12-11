@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchShipment, addShipment, updateShipment, fetchAllShipments } from '../services/api';
+import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const [trackingNumber, setTrackingNumber] = useState('');
@@ -180,9 +181,9 @@ const AdminDashboard = () => {
       </div>
 
       {/* List of All Shipments */}
-      <div>
+      <div class="table-container">
         <h3>All Shipments</h3>
-        <table>
+        <table class="admin-dashboard-table">
           <thead>
             <tr>
               <th>Tracking Number</th>

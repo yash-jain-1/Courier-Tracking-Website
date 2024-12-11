@@ -1,174 +1,114 @@
-/* Admin Dashboard Styles */
+/* Updated Admin Dashboard Styles */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+.container {
+  width: 100%;
+  max-width: 900px;
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
-  body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f2f2f2;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
+}
+
+input[type="text"],
+input[type="password"],
+input[type="date"] {
+  width: 95%; /* Consistent width for inputs */
+  padding: 0.8rem; /* Symmetrical padding */
+  margin: 0.8rem auto; /* Symmetrical margin and centered */
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+  display: block;
+}
+
+
+
+
+.section {
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.section:not(:last-child) {
+  margin-bottom: 1.5rem;
+}
+
+/* Improve table styling */
+.admin-dashboard table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-dashboard th,
+.admin-dashboard td {
+  border: none;
+  padding: 1rem;
+  text-align: left;
+}
+
+.admin-dashboard th {
+  background-color: #9d0000;
+  font-weight: 500;
+}
+
+.admin-dashboard tbody tr:nth-child(even) {
+  background-color: #f8f8f8;
+}
+
+.admin-dashboard tbody tr:hover {
+  background-color: #ec303070;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   .container {
-    width: 100%;
-    max-width: 900px;
-    background-color: #fff;
-    padding: 2.5rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 0.5s ease-in-out;
-  }
-  
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  h2 {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #3c3c3c;
-    font-size: 2.2rem;
-  }
-  
-  h3 {
-    margin-bottom: 1.2rem;
-    color: #3c3c3c;
-    font-size: 1.6rem;
-  }
-  
-  input[type="text"],
-  input[type="password"] {
-    width: 100%;
-    padding: 3rem;
-    margin: 0.75rem 0 1.5rem 0;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
-  }
-  
-  input[type="text"]:focus,
-  input[type="password"]:focus {
-    outline: none;
-    border-color: #3498db;
-  }
-  
-  button {
-    width: 100%;
     padding: 1rem;
-    margin-top: 1.5rem;
-    border: none;
-    border-radius: 6px;
-    background-color: #3498db;
-    color: #fff;
-    font-size: 1.1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s;
   }
-  
-  button:hover {
-    background-color: #2980b9;
-  }
-  
-  pre {
-    background-color: #f5f5f5;
-    padding: 1.2rem;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    overflow-x: auto;
+
+  input[type="text"],
+  input[type="password"],
+  input[type="date"] {
+    width: 90%; /* Adjust width for smaller screens */
+    padding: 0.6rem; /* Adjust padding */
     font-size: 0.9rem;
   }
-  
-  .section {
-    margin-bottom: 2.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid #e0e0e0;
+
+  button {
+    width: 90%;
+    padding: 0.6rem; /* Adjust padding */
+    font-size: 0.9rem;
   }
-  
-  /* Login Form */
-  .login-form input {
-    margin-top: 0.75rem;
-  }
-  
-  .login-form button {
-    margin-top: 1.5rem;
-  }
-  
-  /* Admin Dashboard Table */
-  .admin-dashboard table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1.5rem;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  
+
   .admin-dashboard th,
   .admin-dashboard td {
-    border: none;
-    padding: 1rem;
-    text-align: left;
+    padding: 0.6rem;
   }
-  
-  .admin-dashboard th {
-    background-color: #f2f2f2;
-    font-weight: 500;
-  }
-  
-  .admin-dashboard tbody tr:nth-child(even) {
-    background-color: #f8f8f8;
-  }
-  
-  .admin-dashboard tbody tr:hover {
-    background-color: #f0f0f0;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .container {
-      padding: 1.5rem;
-    }
-  
-    h2 {
-      font-size: 1.8rem;
-    }
-  
-    h3 {
-      font-size: 1.4rem;
-    }
-  
-    input[type="text"],
-    input[type="password"] {
-      padding: 0.8rem;
-      font-size: 0.9rem;
-    }
-  
-    button {
-      padding: 0.8rem;
-      font-size: 1rem;
-    }
-  
-    pre {
-      font-size: 0.85rem;
-    }
-  
-    .admin-dashboard th,
-    .admin-dashboard td {
-      padding: 0.8rem;
-    }
-  }
+}

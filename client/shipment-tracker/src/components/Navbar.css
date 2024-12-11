@@ -1,35 +1,83 @@
+/* General Navbar Styles */
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #333;
-    color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  border-radius: 10px;
+}
+
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.navbar-logo a {
+  color: #f1f1f1;
+  text-decoration: none;
+  font-size: 2rem;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+}
+
+.navbar-links li a {
+  color: #f1f1f1;
+  text-decoration: none;
+  font-size: 1.2rem;
+}
+
+.navbar-links li a:hover {
+  color: #ff6347;
+}
+
+/* Hamburger Menu Styles */
+.hamburger {
+  width: 3rem;
+  display: none; /* Hidden by default */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.hamburger .line {
+  width: 1.5rem;
+  height: 0.2rem;
+  background-color: #f1f1f1;
+  border-radius: 2px;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex; /* Show hamburger menu on smaller screens */
+    margin-bottom: 20px;
   }
-  
-  .navbar-logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  
-  .navbar-logo a {
-    color: #f1f1f1;
-    text-decoration: none;
-  }
-  
+
   .navbar-links {
-    list-style: none;
-    display: flex;
-    gap: 20px;
+    display: none; /* Hide links by default */
+    flex-direction: column;
+    gap: 10px;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    background-color: #333;
+    padding: 10px;
+    border-radius: 8px;
+    width: 200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   }
-  
-  .navbar-links li a {
-    color: #f1f1f1;
-    text-decoration: none;
-    font-size: 1rem;
+
+  .navbar-links.active {
+    display: flex; /* Show links when menu is open */
   }
-  
-  .navbar-links li a:hover {
-    color: #ff6347;
-  }
-  
+}

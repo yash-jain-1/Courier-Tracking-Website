@@ -21,7 +21,6 @@ const App = () => {
     <Router>
       <div className="App">
         <NavBar />
-        
         <div className="main-content">
           <Routes>
             <Route path="/" element={<Home />} />

@@ -25,7 +25,6 @@ const TrackShipment = () => {
 
   return (
     <div className="shipment-tracker">
-      <h2>Track Your Shipment</h2>
       <input
         type="text"
         value={trackingNumber}

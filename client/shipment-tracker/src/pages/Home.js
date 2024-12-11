@@ -15,7 +15,7 @@ const Home = () => {
       
       {/* Track Shipment Container */}
       <div className="track-shipment-container">
-        <h3 className="track-shipment-title">Track Your Shipment</h3>
+        <h2 className="track-shipment-title">Track Your Shipment</h2>
         <TrackShipment />
       </div>
       
