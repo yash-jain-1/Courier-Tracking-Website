@@ -10,7 +10,7 @@ export const fetchShipment = (trackingNumber) => {
 
 // Admin login
 export const adminLogin = (credentials) => {
-  return axios.post(`${API_URL}/admin/login`, credentials);
+  return axios.post(`${API_URL}/auth/login`, credentials);
 };
 
 // Add a new shipment
@@ -18,7 +18,6 @@ export const addShipment = (shipmentData) => axios.post(`${API_URL}/shipments`, 
 
 // Update shipment details (add update)
 export const updateShipment = (trackingNumber, updateData) => axios.post(`${API_URL}/shipments/${trackingNumber}/updates`, updateData);
-
 
 // Fetch all shipments for admin
 export const fetchAllShipments = () => {
