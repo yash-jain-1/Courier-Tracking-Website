@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 const cors = require('cors');
 app.use(cors({
-  origin: 'http://localhost:3000', // Your frontend URL
+  origin: 'https://courier-tracking-website.onrender.com/api', // Your frontend URL
   credentials: true
 }));
 
