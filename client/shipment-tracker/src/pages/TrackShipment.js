@@ -12,7 +12,7 @@ const TrackShipment = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get(`http://localhost:3001/api/shipments/${trackingNumber}`);
+      const response = await axios.get(`https://courier-tracking-website.onrender.com/api/shipments/${trackingNumber}`);
       setShipmentData(response.data);
       setError(null);
     } catch (err) {

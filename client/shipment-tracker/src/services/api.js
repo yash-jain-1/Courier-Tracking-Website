@@ -1,7 +1,7 @@
 // src/services/api.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001/api'; // Your backend URL
+const API_URL = 'https://courier-tracking-website.onrender.com/api'; // Your backend URL
 
 // Fetch shipment details
 export const fetchShipment = (trackingNumber) => {
