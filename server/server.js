@@ -1,5 +1,5 @@
 // require('dotenv').config(); // Ensure this is at the top
-
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -18,7 +18,7 @@ app.use(cors({
 }));
 
 // MongoDB connection string (ensure to handle this securely)
-const MONGO_URI = "mongodb+srv://yashjainstudy:dTnOPPfBqGs6maM2@courier.gv4ed.mongodb.net/?retryWrites=true&w=majority&appName=Courier";
+const MONGO_URI = process.env.MONGO_URI;
 // TODO: Remove the connection string from the source code and move it to an environment variable
 mongoose.connect(MONGO_URI, {
   dbName: 'test',
@@ -96,5 +96,5 @@ app.post('/api/shipments/:trackingNumber/updates', async (req, res) => {
 });
 
 // Define port
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

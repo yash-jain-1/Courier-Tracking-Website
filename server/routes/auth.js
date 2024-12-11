@@ -4,9 +4,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const router = express.Router();
+require('dotenv').config();
 
-const JWT_SECRET = 'abec915236b975afc4e3656563961a173f405c3e8b8c750e93fe87412bacb47d4e1e8e6cccc8a0ac34545bbca873fb55073c06eaeb865f557c48a020a1d17e4fy';
-// TODO: Put the JWT_SECRET in a .env file
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Register Route
 router.post('/register', async (req, res) => {
