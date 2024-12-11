@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 const cors = require('cors');
 app.use(cors({
-  origin: 'https://courier-tracking-website.onrender.com/api', // Your frontend URL
+  origin: 'https://shanucourier.netlify.app', // Your frontend URL
   credentials: true
 }));
 
