@@ -15,9 +15,7 @@ import {
   StatLabel,
   StatNumber,
   StatHelpText,
-  Avatar,
   Flex,
-  Divider,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import {

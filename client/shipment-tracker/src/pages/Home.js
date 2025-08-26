@@ -10,10 +10,10 @@ import {
   VStack,
   SimpleGrid,
   Icon,
-  useColorModeValue,
   Divider,
   Badge,
 } from '@chakra-ui/react';
+// Removed unused import useColorModeValue
 import { motion } from 'framer-motion';
 import {
   FaTruck,
