@@ -117,6 +117,24 @@ const getStatusColor = (status) => {
   }
 };
 
+/**
+ * Formats a date string into a readable format for display.
+ * @param {string} dateStr
+ * @returns {string}
+ */
+const formatDateTime = (dateStr) => {
+  const d = new Date(dateStr);
+  return isNaN(d.getTime())
+    ? 'N/A'
+    : d.toLocaleString('en-IN', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+};
+
 const AdminDashboard = () => {
   const [shipments, setShipments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -171,6 +189,13 @@ const AdminDashboard = () => {
       setShipments(response.data);
     } catch (error) {
       console.error('Error fetching shipments:', error);
+      toast({
+        title: 'API Not Available',
+        description: 'Backend API "/api/admin/shipments" not found. Using mock data for demonstration.',
+        status: 'warning',
+        duration: 4000,
+        isClosable: true,
+      });
       // For demo purposes, using mock data
       setShipments([
         {
@@ -436,21 +461,9 @@ const AdminDashboard = () => {
                               variant="subtle"
                               px={2}
                               py={1}
-                              rounded="full"
-                              fontSize="xs"
-                            >
-                              {shipment.status?.toUpperCase()}
-                            </Badge>
-                          </Td>
-                          <Td color="gray.600">{shipment.location}</Td>
                           <Td color="gray.600">
-                            {(() => {
-                              const dateStr = shipment.updatedAt || shipment.createdAt;
-                              const d = new Date(dateStr);
-                              return isNaN(d.getTime())
-                                ? 'N/A'
-                                : d.toLocaleString('en-IN', {
-                                    year: 'numeric',
+                            {formatDateTime(shipment.updatedAt || shipment.createdAt)}
+                          </Td>
                                     month: 'short',
                                     day: '2-digit',
                                     hour: '2-digit',
