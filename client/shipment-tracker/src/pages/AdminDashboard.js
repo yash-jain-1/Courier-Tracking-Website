@@ -37,8 +37,6 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  Alert,
-  AlertIcon,
   Stat,
   StatLabel,
   StatNumber,
@@ -60,7 +58,6 @@ import {
   FaEllipsisV,
   FaDownload,
   FaSearch,
-  FaFilter,
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -177,6 +174,7 @@ const AdminDashboard = () => {
     }
 
     fetchShipments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   const fetchShipments = async () => {
@@ -461,15 +459,15 @@ const AdminDashboard = () => {
                               variant="subtle"
                               px={2}
                               py={1}
+                            >
+                              {shipment.status?.toUpperCase()}
+                            </Badge>
+                          </Td>
+                          <Td color="gray.600">
+                            {shipment.location}
+                          </Td>
                           <Td color="gray.600">
                             {formatDateTime(shipment.updatedAt || shipment.createdAt)}
-                          </Td>
-                                    month: 'short',
-                                    day: '2-digit',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                  });
-                            })()}
                           </Td>
                           <Td>
                             <Menu>
