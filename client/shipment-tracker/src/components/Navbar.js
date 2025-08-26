@@ -11,10 +11,8 @@ import {
   MenuList,
   MenuItem,
   useDisclosure,
-  useColorModeValue,
   Stack,
   Container,
-  Image,
   Text,
   Collapse,
 } from '@chakra-ui/react';
