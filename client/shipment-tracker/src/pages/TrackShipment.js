@@ -221,8 +221,9 @@ const TrackShipment = () => {
   };
 
   return (
-    <Box w="full">
-      <VStack spacing={6} align="stretch">
+    <Flex w="full" mt={7} px={{ base: 4, md: 16, lg: 32 }} justify="center">
+      <Box w="full" maxW="400px">
+        <VStack spacing={6} align="stretch">
         {/* Search Section */}
         <VStack spacing={4}>
           <HStack w="full" spacing={3}>
@@ -380,8 +381,9 @@ const TrackShipment = () => {
             </MotionBox>
           )}
         </AnimatePresence>
-      </VStack>
-    </Box>
+        </VStack>
+      </Box>
+    </Flex>
   );
 };
 

@@ -420,7 +420,7 @@ const AdminDashboard = () => {
                         <Th>Tracking Number</Th>
                         <Th>Status</Th>
                         <Th>Location</Th>
-                        <Th>Created</Th>
+                        <Th>Last Updated at</Th>
                         <Th>Actions</Th>
                       </Tr>
                     </Thead>
@@ -444,7 +444,19 @@ const AdminDashboard = () => {
                           </Td>
                           <Td color="gray.600">{shipment.location}</Td>
                           <Td color="gray.600">
-                            {new Date(shipment.createdAt).toLocaleDateString()}
+                            {(() => {
+                              const dateStr = shipment.updatedAt || shipment.createdAt;
+                              const d = new Date(dateStr);
+                              return isNaN(d.getTime())
+                                ? 'N/A'
+                                : d.toLocaleString('en-IN', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  });
+                            })()}
                           </Td>
                           <Td>
                             <Menu>

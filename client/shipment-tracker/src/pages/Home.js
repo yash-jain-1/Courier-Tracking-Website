@@ -24,7 +24,7 @@ import {
   FaHeadset,
   FaCheckCircle,
 } from 'react-icons/fa';
-import TrackShipment from './TrackShipment';
+import HomeTrackShipment from '../components/HomeTrackShipment';
 
 const MotionBox = motion(Box);
 const MotionContainer = motion(Container);
@@ -234,7 +234,7 @@ const Home = () => {
                   
                   <Divider />
                   
-                  <TrackShipment />
+                  <HomeTrackShipment />
                 </VStack>
               </Box>
             </MotionBox>

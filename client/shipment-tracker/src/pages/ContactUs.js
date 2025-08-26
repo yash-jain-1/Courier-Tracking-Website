@@ -44,9 +44,13 @@ const ContactCard = ({ icon, title, info, link, linkText }) => (
     variant="elevated"
     whileHover={{ y: -5 }}
     transition={{ duration: 0.2 }}
+    minH="340px"
+    display="flex"
+    flexDirection="column"
+    justifyContent="center"
   >
-    <CardBody textAlign="center" p={8}>
-      <VStack spacing={4}>
+    <CardBody textAlign="center" p={8} h="full" display="flex" flexDirection="column" justifyContent="center">
+      <VStack spacing={4} flex={1} justify="center">
         <Box p={4} bg="brand.100" rounded="full">
           <Icon as={icon} w={8} h={8} color="brand.500" />
         </Box>
@@ -154,28 +158,28 @@ const ContactUs = () => {
     {
       icon: FaPhone,
       title: 'Phone Number',
-      info: '+91 98765 43210',
-      link: 'tel:+919876543210',
+      info: '+91 9826526591, +91 9575793006',
+      link: 'tel:+919826526591',
       linkText: 'Call Now'
     },
     {
       icon: FaEnvelope,
       title: 'Email Address',
       info: 'support@shanucourier.com',
-      link: 'mailto:support@shanucourier.com',
+      link: 'mailto:shanucourier@gmail.com',
       linkText: 'Send Email'
     },
     {
       icon: FaMapMarkerAlt,
       title: 'Head Office',
-      info: '123 Business District, Indore, Madhya Pradesh 452001',
-      link: 'https://maps.google.com',
+  info: 'Shop No. 20, Sapna Sangeeta Road, Near Next Showroom, Near Punjab National Bank, Indore, Madhya Pradesh, 452001, India',
+      link: 'https://maps.app.goo.gl/1YTkgvhz1bVxYNMw8',
       linkText: 'View on Map'
     },
     {
       icon: FaClock,
       title: 'Business Hours',
-      info: 'Monday - Saturday: 9:00 AM - 6:00 PM, Sunday: 10:00 AM - 4:00 PM',
+      info: 'Monday - Saturday: 10:00 AM - 08:30 PM, Sunday: Closed', 
       link: null,
       linkText: null
     }
@@ -380,28 +384,36 @@ const ContactUs = () => {
             viewport={{ once: true }}
           >
             <VStack spacing={8} h="full">
-              {/* Map Placeholder */}
+              {/* Embedded Google Map */}
               <Card variant="elevated" w="full">
                 <CardBody p={0}>
-                  <Box
-                    h="300px"
-                    bg="gray.100"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    rounded="lg"
-                    position="relative"
-                    overflow="hidden"
-                  >
-                    <VStack spacing={3}>
-                      <Icon as={FaMapMarkerAlt} w={12} h={12} color="gray.400" />
-                      <Text color="gray.500" fontWeight="600">
-                        Indore, Madhya Pradesh
-                      </Text>
-                      <Text fontSize="sm" color="gray.400">
-                        Interactive map coming soon
-                      </Text>
-                    </VStack>
+                  <Box w="full" maxW="600px" mx="auto" borderRadius="lg" overflow="hidden" boxShadow="md">
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d921.7823760413789!2d75.86882955819986!3d22.701336416646228!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3962fce275316b71%3A0x5f3902ac8f039c2!2sPnb%20Circle%20Office%20Indore!5e0!3m2!1sen!2sin!4v1756238081542!5m2!1sen!2sin"
+                      width="100%"
+                      height="450"
+                      // style removed to ensure no border is applied
+                      allowFullScreen=""
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="Shanu Services Location"
+                    ></iframe>
+                  </Box>
+                  <Box mt={4} mb={6} textAlign="center">
+                    <Button
+                      as="a"
+                      href="https://www.google.com/maps/place/Pnb+Circle+Office+Indore/@22.7013364,75.8688296,19z/data=!4m6!3m5!1s0x3962fce275316b71:0x5f3902ac8f039c2!8m2!3d22.7013364!4d75.869376!16s%2Fg%2F11c4y1w2qg?entry=ttu"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      colorScheme="blue"
+                      size="md"
+                      rounded="md"
+                      fontWeight="semibold"
+                      leftIcon={<FaMapMarkerAlt />}
+                      _hover={{ bg: 'blue.600' }}
+                    >
+                      View on Google Maps
+                    </Button>
                   </Box>
                 </CardBody>
               </Card>

@@ -173,29 +173,29 @@ const AboutUs = () => {
 
   const timeline = [
     {
+      year: '2001',
+      title: 'Shanu Services Established',
+      description: 'Founded in Indore, Madhya Pradesh, Shanu Services began its journey in the cargo movers and packers industry.'
+    },
+    {
+      year: '2005',
+      title: 'All India Road Transportation',
+      description: 'Expanded our services to provide road transportation solutions across all of India.'
+    },
+    {
+      year: '2010',
+      title: 'Packers & Movers Expertise',
+      description: 'Gained recognition for reliable and efficient packers and movers services.'
+    },
+    {
       year: '2018',
-      title: 'Company Founded',
-      description: 'Started as a small courier service in Indore with a vision to connect India.'
-    },
-    {
-      year: '2019',
-      title: 'Regional Expansion',
-      description: 'Expanded operations to cover major cities in Madhya Pradesh and neighboring states.'
-    },
-    {
-      year: '2021',
-      title: 'Technology Integration',
-      description: 'Launched our real-time tracking system and mobile-friendly platform.'
-    },
-    {
-      year: '2023',
-      title: 'Pan-India Network',
-      description: 'Achieved nationwide coverage with 200+ cities and towns in our delivery network.'
+      title: 'Service Diversification',
+      description: 'Broadened our offerings to include specialized cargo and logistics solutions.'
     },
     {
       year: '2025',
-      title: 'Digital Excellence',
-      description: 'Leading the industry with AI-powered logistics and sustainable delivery solutions.',
+      title: 'Trusted Partner',
+      description: 'Now a trusted name in cargo, road transport, and packers movers for clients across India.',
       isLast: true
     },
   ];
@@ -212,14 +212,13 @@ const AboutUs = () => {
           >
             <VStack spacing={6} textAlign="center" maxW="4xl" mx="auto">
               <Badge colorScheme="blue" variant="solid" px={4} py={2} rounded="full">
-                Since 2018
+                Established 2001
               </Badge>
               <Heading fontSize={{ base: '4xl', md: '5xl' }} fontWeight="bold">
                 About Shanu Services
               </Heading>
               <Text fontSize={{ base: 'lg', md: 'xl' }} opacity={0.9} maxW="3xl">
-                We are India's trusted courier partner, dedicated to connecting people and businesses 
-                across the nation with reliable, fast, and secure delivery solutions.
+                Established in 2001, Shanu Services has gained immense expertise in offering Cargo Movers Service, Road Transportation Service In All India, Packers Movers etc. We are located in Indore, Madhya Pradesh and providing Cargo Movers Service, Road Transportation Service In All India, Packers Movers to the clients.
               </Text>
             </VStack>
           </MotionBox>

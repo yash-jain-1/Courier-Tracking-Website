@@ -33,7 +33,7 @@ const MotionCard = motion(Card);
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -55,7 +55,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.email || !formData.password) {
+    if (!formData.username || !formData.password) {
       setError('Please fill in all fields');
       return;
     }
@@ -65,7 +65,7 @@ const Login = () => {
 
     try {
       const response = await axios.post('/api/auth/login', {
-        email: formData.email,
+        username: formData.username,
         password: formData.password,
       });
 
@@ -154,14 +154,14 @@ const Login = () => {
 
                     <FormControl isRequired>
                       <FormLabel color="gray.700" fontWeight="600">
-                        Email Address
+                        Username
                       </FormLabel>
                       <InputGroup>
                         <Input
-                          name="email"
-                          type="email"
-                          placeholder="Enter your email"
-                          value={formData.email}
+                          name="username"
+                          type="text"
+                          placeholder="Enter your username"
+                          value={formData.username}
                           onChange={handleInputChange}
                           bg="white"
                           border="2px solid"
@@ -174,7 +174,7 @@ const Login = () => {
                           disabled={loading}
                         />
                         <InputRightElement>
-                          <AtSignIcon color="gray.400" />
+                          <FaUserShield color="gray.400" />
                         </InputRightElement>
                       </InputGroup>
                     </FormControl>
