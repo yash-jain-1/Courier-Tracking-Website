@@ -148,7 +148,7 @@ const AdminDashboard = () => {
       date: new Date().toISOString().split('T')[0],
       time: new Date().toLocaleTimeString(),
       location: '',
-      activity: '',
+  status: '',
       remarks: ''
     }
   });
@@ -205,7 +205,7 @@ const AdminDashboard = () => {
           location: 'Mumbai',
           createdAt: new Date().toISOString(),
           updates: [
-            { date: '2025-01-20', time: '10:30 AM', location: 'Mumbai', activity: 'Package Delivered', remarks: 'Delivered to recipient' }
+            { date: '2025-01-20', time: '10:30 AM', location: 'Mumbai', status: 'Package Delivered', remarks: 'Delivered to recipient' }
           ]
         },
         {
@@ -215,7 +215,7 @@ const AdminDashboard = () => {
           location: 'Delhi',
           createdAt: new Date().toISOString(),
           updates: [
-            { date: '2025-01-20', time: '08:45 AM', location: 'Delhi', activity: 'In Transit', remarks: 'Package on the way' }
+            { date: '2025-01-20', time: '08:45 AM', location: 'Delhi', status: 'In Transit', remarks: 'Package on the way' }
           ]
         }
       ]);
@@ -296,7 +296,7 @@ const AdminDashboard = () => {
         date: new Date().toISOString().split('T')[0],
         time: new Date().toLocaleTimeString(),
         location: '',
-        activity: '',
+  status: '',
         remarks: ''
       }
     });
@@ -592,14 +592,14 @@ const AdminDashboard = () => {
                     />
                   </FormControl>
                   <FormControl isRequired>
-                    <FormLabel>Activity</FormLabel>
+                    <FormLabel>Status Description</FormLabel>
                     <Input
-                      value={formData.updateData.activity}
+                      value={formData.updateData.status}
                       onChange={(e) => setFormData({
                         ...formData,
-                        updateData: {...formData.updateData, activity: e.target.value}
+                        updateData: {...formData.updateData, status: e.target.value}
                       })}
-                      placeholder="Enter activity description"
+                      placeholder="Enter status description"
                     />
                   </FormControl>
                   <FormControl>
@@ -661,7 +661,7 @@ const AdminDashboard = () => {
                           {selectedShipment.updates.map((update, index) => (
                             <Box key={index} p={3} bg="gray.50" rounded="lg">
                               <HStack justify="space-between" mb={1}>
-                                <Text fontSize="sm" fontWeight="600">{update.activity}</Text>
+                                <Text fontSize="sm" fontWeight="600">{update.status}</Text>
                                 <Text fontSize="xs" color="gray.500">{update.date}</Text>
                               </HStack>
                               <Text fontSize="xs" color="gray.600">
