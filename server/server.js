@@ -12,10 +12,7 @@ const app = express();
 app.use(bodyParser.json());
 
 const cors = require('cors');
-app.use(cors({
-  origin: 'https://shanucourier.netlify.app', // Your frontend URL
-  credentials: true
-}));
+app.use(cors());
 
 // MongoDB connection string (ensure to handle this securely)
 const MONGO_URI = process.env.MONGO_URI;
