@@ -23,7 +23,7 @@ import {
   Spinner,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { ViewIcon, ViewOffIcon, LockIcon, AtSignIcon } from '@chakra-ui/icons';
+import { ViewIcon, ViewOffIcon, LockIcon} from '@chakra-ui/icons';
 import { FaShieldAlt, FaUserShield } from 'react-icons/fa';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import axios from 'axios';
