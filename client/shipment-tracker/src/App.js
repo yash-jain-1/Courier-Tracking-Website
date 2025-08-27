@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { Box } from '@chakra-ui/react';
+import { Box, useColorModeValue } from '@chakra-ui/react';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import AboutUs from './pages/AboutUs';
@@ -16,9 +16,11 @@ const PrivateRoute = ({ children }) => {
 };
 
 const App = () => {
+  const appBg = useColorModeValue('gray.50', 'gray.900');
+  const appText = useColorModeValue('gray.800', 'gray.100');
   return (
     <Router>
-      <Box minH="100vh" bg="gray.50">
+      <Box minH="100vh" bg={appBg} color={appText}>
         <Navbar />
         <Box>
           <Routes>

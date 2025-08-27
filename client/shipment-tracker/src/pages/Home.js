@@ -12,6 +12,7 @@ import {
   Icon,
   Divider,
   Badge,
+  useColorModeValue,
 } from '@chakra-ui/react';
 // Removed unused import useColorModeValue
 import { motion } from 'framer-motion';
@@ -30,6 +31,10 @@ const MotionBox = motion(Box);
 const MotionContainer = motion(Container);
 
 const Feature = ({ icon, title, text }) => {
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const cardBorder = useColorModeValue('gray.200', 'gray.700');
+  const headingColor = useColorModeValue('navy.800', 'white');
+  const textColor = useColorModeValue('gray.600', 'gray.300');
   return (
     <MotionBox
       whileHover={{ y: -5 }}
@@ -38,13 +43,13 @@ const Feature = ({ icon, title, text }) => {
       <Stack
         align="center"
         p={6}
-        bg="white"
+        bg={cardBg}
         rounded="xl"
         shadow="md"
         spacing={4}
         h="full"
         border="1px solid"
-        borderColor="gray.200"
+        borderColor={cardBorder}
         _hover={{
           shadow: 'lg',
           borderColor: 'brand.200',
@@ -52,10 +57,10 @@ const Feature = ({ icon, title, text }) => {
         transition="all 0.3s"
       >
         <Icon as={icon} w={12} h={12} color="brand.500" />
-        <Heading size="md" color="navy.800" textAlign="center">
+        <Heading size="md" color={headingColor} textAlign="center">
           {title}
         </Heading>
-        <Text color="gray.600" textAlign="center" fontSize="sm">
+        <Text color={textColor} textAlign="center" fontSize="sm">
           {text}
         </Text>
       </Stack>
@@ -63,29 +68,34 @@ const Feature = ({ icon, title, text }) => {
   );
 };
 
-const StatCard = ({ number, label }) => (
-  <MotionBox
-    whileHover={{ scale: 1.05 }}
-    transition={{ duration: 0.2 }}
-  >
-    <VStack
-      p={6}
-      bg="white"
-      rounded="lg"
-      shadow="sm"
-      border="1px solid"
-      borderColor="gray.200"
-      spacing={2}
+const StatCard = ({ number, label }) => {
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const cardBorder = useColorModeValue('gray.200', 'gray.700');
+  const textColor = useColorModeValue('gray.600', 'gray.300');
+  return (
+    <MotionBox
+      whileHover={{ scale: 1.05 }}
+      transition={{ duration: 0.2 }}
     >
-      <Text fontSize="3xl" fontWeight="bold" color="brand.500">
-        {number}
-      </Text>
-      <Text fontSize="sm" color="gray.600" textAlign="center">
-        {label}
-      </Text>
-    </VStack>
-  </MotionBox>
-);
+      <VStack
+        p={6}
+        bg={cardBg}
+        rounded="lg"
+        shadow="sm"
+        border="1px solid"
+        borderColor={cardBorder}
+        spacing={2}
+      >
+        <Text fontSize="3xl" fontWeight="bold" color="brand.500">
+          {number}
+        </Text>
+        <Text fontSize="sm" color={textColor} textAlign="center">
+          {label}
+        </Text>
+      </VStack>
+    </MotionBox>
+  );
+};
 
 const Home = () => {
   const features = [
@@ -121,8 +131,13 @@ const Home = () => {
     },
   ];
 
+  const bg = useColorModeValue('gray.50', 'gray.900');
+  const cardBg = useColorModeValue('white', 'gray.800');
+  // const cardBorder = useColorModeValue('gray.200', 'gray.700');
+  const headingColor = useColorModeValue('navy.800', 'white');
+  const textColor = useColorModeValue('gray.600', 'gray.300');
   return (
-    <Box bg="gray.50" minH="100vh">
+    <Box bg={bg} minH="100vh">
       {/* Hero Section */}
       <MotionContainer
         maxW="7xl"
@@ -157,7 +172,7 @@ const Home = () => {
             <Heading
               fontSize={{ base: '4xl', md: '5xl', lg: '6xl' }}
               fontWeight="bold"
-              color="navy.800"
+              color={headingColor}
               lineHeight="1.1"
             >
               Fast, Reliable{' '}
@@ -168,7 +183,7 @@ const Home = () => {
             
             <Text
               fontSize={{ base: 'lg', md: 'xl' }}
-              color="gray.600"
+              color={textColor}
               maxW="lg"
             >
               Your trusted partner for secure and timely delivery across India. 
@@ -224,10 +239,10 @@ const Home = () => {
                 <VStack spacing={6} align="stretch">
                   <VStack spacing={2}>
                     <Icon as={FaTruck} w={8} h={8} color="brand.500" />
-                    <Heading size="lg" color="navy.800" textAlign="center">
+                    <Heading size="lg" color={headingColor} textAlign="center">
                       Track Your Shipment
                     </Heading>
-                    <Text color="gray.600" textAlign="center" fontSize="sm">
+                    <Text color={textColor} textAlign="center" fontSize="sm">
                       Enter your tracking number to get real-time updates
                     </Text>
                   </VStack>
@@ -243,7 +258,7 @@ const Home = () => {
       </MotionContainer>
 
       {/* Features Section */}
-      <Box bg="white" py={20}>
+  <Box bg={cardBg} py={20}>
         <Container maxW="7xl">
           <MotionBox
             initial={{ opacity: 0, y: 30 }}
@@ -255,14 +270,14 @@ const Home = () => {
               <VStack spacing={4}>
                 <Heading
                   fontSize={{ base: '3xl', md: '4xl' }}
-                  color="navy.800"
+                  color={headingColor}
                   textAlign="center"
                 >
                   Why Choose Shanu Services?
                 </Heading>
                 <Text
                   fontSize="lg"
-                  color="gray.600"
+                  color={textColor}
                   textAlign="center"
                   maxW="2xl"
                 >

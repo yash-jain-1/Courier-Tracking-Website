@@ -113,17 +113,24 @@ const components = {
   },
 };
 
+
+const config = {
+  initialColorMode: "light",
+  useSystemColorMode: true,
+};
+
 const customTheme = extendTheme({
+  config,
   colors,
   fonts,
   components,
   styles: {
-    global: {
+    global: (props) => ({
       body: {
-        bg: "gray.50",
-        color: "gray.800",
+        bg: props.colorMode === "dark" ? "gray.900" : "gray.50",
+        color: props.colorMode === "dark" ? "gray.100" : "gray.800",
       },
-    },
+    }),
   },
 });
 

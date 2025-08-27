@@ -20,6 +20,7 @@ import {
   AlertIcon,
   useToast,
   Spinner,
+  useColorModeValue,
 } from '@chakra-ui/react';
 // Removed unused import Divider
 import { motion } from 'framer-motion';
@@ -185,8 +186,13 @@ const ContactUs = () => {
     }
   ];
 
+  const bg = useColorModeValue('gray.50', 'gray.900');
+  // const cardBg = useColorModeValue('white', 'gray.800');
+  // const cardBorder = useColorModeValue('gray.200', 'gray.700');
+  // const headingColor = useColorModeValue('navy.800', 'white');
+  // const textColor = useColorModeValue('gray.600', 'gray.300');
   return (
-    <Box bg="gray.50" minH="100vh">
+    <Box bg={bg} minH="100vh">
       {/* Hero Section */}
       <Box bg="navy.800" color="white" py={16}>
         <Container maxW="7xl">
