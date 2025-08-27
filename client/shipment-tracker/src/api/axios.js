@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'https://courier-tracking-website.onrender.com/api'  // Updated to correct port 3001
+    baseURL: process.env.REACT_APP_API_BASE, // Use environment variable for base URL
 });
 
 export default instance;
