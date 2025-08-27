@@ -1,6 +1,7 @@
 {
   "name": "shipment-tracker",
   "version": "0.1.0",
+  "proxy": "https://courier-tracking-website.onrender.com",
   "private": true,
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
