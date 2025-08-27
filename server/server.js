@@ -12,11 +12,12 @@ const app = express();
 app.use(bodyParser.json());
 
 const cors = require('cors');
-app.use(cors({
-  origin: 'https://shanucourier.netlify.app', // Your frontend URL
-  credentials: true
-}));
+const corsOptions = {
+  origin: 'https://shanucourier.netlify.app/',
+  optionsSuccessStatus: 200 // For legacy browser support
+};
 
+app.use(cors(corsOptions));
 // MongoDB connection string (ensure to handle this securely)
 const MONGO_URI = process.env.MONGO_URI;
 // TODO: Remove the connection string from the source code and move it to an environment variable
