@@ -20,8 +20,8 @@ import {
   AlertIcon,
   useToast,
   Spinner,
-  Divider,
 } from '@chakra-ui/react';
+// Removed unused import Divider
 import { motion } from 'framer-motion';
 import {
   FaPhone,

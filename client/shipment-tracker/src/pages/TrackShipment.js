@@ -18,8 +18,8 @@ import {
   Spinner,
   Icon,
   Flex,
-  Container,
 } from '@chakra-ui/react';
+// Removed unused import Container
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaSearch,
