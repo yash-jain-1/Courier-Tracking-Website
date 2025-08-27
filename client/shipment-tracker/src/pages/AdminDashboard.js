@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
-  VStack,
-  HStack,
-  SimpleGrid,
   Heading,
   Text,
-  Button,
-  Input,
-  Select,
-  Textarea,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  StatArrow,
+  HStack,
+  VStack,
+  SimpleGrid,
   Card,
   CardBody,
   CardHeader,
@@ -20,32 +21,33 @@ import {
   Tr,
   Th,
   Td,
-  Badge,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  FormControl,
-  FormLabel,
-  useDisclosure,
+  Spinner,
   useToast,
-  IconButton,
+  Button,
+  Select,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  StatArrow,
-  Divider,
+  useDisclosure,
+  Badge,
+  useColorModeValue,
   Flex,
-  Spinner,
+  IconButton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  FormControl,
+  FormLabel,
+  Input,
+  Divider,
+  Textarea,
 } from '@chakra-ui/react';
+
 import { motion } from 'framer-motion';
 import {
   FaPlus,
@@ -329,19 +331,20 @@ const AdminDashboard = () => {
     navigate('/login');
   };
 
+  const bg = useColorModeValue('gray.50', 'gray.900');
+  const textColor = useColorModeValue('gray.600', 'gray.300');
   if (loading) {
     return (
-      <Box bg="gray.50" minH="100vh" display="flex" alignItems="center" justifyContent="center">
+      <Box bg={bg} minH="100vh" display="flex" alignItems="center" justifyContent="center">
         <VStack spacing={4}>
           <Spinner size="xl" color="brand.500" />
-          <Text color="gray.600">Loading dashboard...</Text>
+          <Text color={textColor}>Loading dashboard...</Text>
         </VStack>
       </Box>
     );
   }
-
   return (
-    <Box bg="gray.50" minH="100vh">
+    <Box bg={bg} minH="100vh">
       <Container maxW="7xl" py={8}>
         <MotionBox
           initial={{ opacity: 0, y: 20 }}

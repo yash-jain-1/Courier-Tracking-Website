@@ -16,6 +16,8 @@ import {
   Text,
   Collapse,
 } from '@chakra-ui/react';
+import { useColorMode, useColorModeValue } from '@chakra-ui/react';
+import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { HamburgerIcon, CloseIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -49,12 +51,16 @@ const NavLink = ({ children, to, icon }) => (
   </Link>
 );
 
+
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(
     !!localStorage.getItem('token')
   );
+  const { colorMode, toggleColorMode } = useColorMode();
+  const navBg = useColorModeValue('navy.800', 'gray.900');
+  const navText = useColorModeValue('white', 'gray.100');
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -64,7 +70,7 @@ const Navbar = () => {
 
   return (
     <MotionBox
-      bg="navy.800"
+      bg={navBg}
       px={4}
       py={2}
       boxShadow="lg"
@@ -73,7 +79,7 @@ const Navbar = () => {
       transition={{ duration: 0.5 }}
     >
       <Container maxW="7xl">
-        <Flex h={16} alignItems="center" justifyContent="space-between">
+  <Flex h={16} alignItems="center" justifyContent="space-between">
           {/* Logo Section */}
           <Link as={RouterLink} to="/" _hover={{ textDecoration: 'none' }}>
             <HStack spacing={3}>
@@ -164,18 +170,39 @@ const Navbar = () => {
               </Button>
             )}
           </HStack>
-
-          {/* Mobile menu button */}
+          {/* Dark Mode Toggle */}
           <IconButton
-            size="md"
-            icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
-            aria-label="Open Menu"
-            display={{ md: 'none' }}
-            onClick={isOpen ? onClose : onOpen}
+            aria-label="Toggle dark mode"
+            icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+            onClick={toggleColorMode}
             variant="ghost"
-            color="white"
-            _hover={{ bg: 'navy.700' }}
+            color={navText}
+            _hover={{ bg: useColorModeValue('navy.700', 'gray.700') }}
+            ml={4}
+            fontSize="xl"
+            display={{ base: 'none', md: 'inline-flex' }}
           />
+
+          {/* Mobile menu button and dark mode toggle for mobile */}
+          <HStack spacing={2} display={{ md: 'none' }}>
+            <IconButton
+              size="md"
+              icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
+              aria-label="Open Menu"
+              onClick={isOpen ? onClose : onOpen}
+              variant="ghost"
+              color={navText}
+              _hover={{ bg: useColorModeValue('navy.700', 'gray.700') }}
+            />
+            <IconButton
+              aria-label="Toggle dark mode"
+              icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+              onClick={toggleColorMode}
+              variant="ghost"
+              color={navText}
+              fontSize="xl"
+            />
+          </HStack>
         </Flex>
 
         {/* Mobile Navigation */}

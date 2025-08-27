@@ -21,6 +21,7 @@ import {
   Divider,
   useToast,
   Spinner,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { ViewIcon, ViewOffIcon, LockIcon} from '@chakra-ui/icons';
@@ -103,8 +104,14 @@ const Login = () => {
     }
   };
 
+  const bg = useColorModeValue('gray.50', 'gray.900');
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const cardBorder = useColorModeValue('gray.200', 'gray.700');
+  const headingColor = useColorModeValue('navy.800', 'white');
+  const textColor = useColorModeValue('gray.600', 'gray.300');
+  const inputBg = useColorModeValue('white', 'gray.700');
   return (
-    <Box bg="gray.50" minH="100vh" py={12}>
+    <Box bg={bg} minH="100vh" py={12}>
       <Container maxW="md">
         <MotionBox
           initial={{ opacity: 0, y: 50 }}
@@ -126,10 +133,10 @@ const Login = () => {
               </MotionBox>
               
               <VStack spacing={2}>
-                <Heading color="navy.800" fontSize="2xl">
+                <Heading color={headingColor} fontSize="2xl">
                   Admin Login
                 </Heading>
-                <Text color="gray.600">
+                <Text color={textColor}>
                   Sign in to access your dashboard
                 </Text>
               </VStack>
@@ -142,7 +149,7 @@ const Login = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <CardBody p={8}>
+              <CardBody p={8} bg={cardBg} borderRadius="lg" borderColor={cardBorder}>
                 <form onSubmit={handleSubmit}>
                   <VStack spacing={6}>
                     {error && (
@@ -163,9 +170,9 @@ const Login = () => {
                           placeholder="Enter your username"
                           value={formData.username}
                           onChange={handleInputChange}
-                          bg="white"
+                          bg={inputBg}
                           border="2px solid"
-                          borderColor="gray.200"
+                          borderColor={cardBorder}
                           _hover={{ borderColor: 'brand.300' }}
                           _focus={{
                             borderColor: 'brand.500',
@@ -190,9 +197,9 @@ const Login = () => {
                           placeholder="Enter your password"
                           value={formData.password}
                           onChange={handleInputChange}
-                          bg="white"
+                          bg={inputBg}
                           border="2px solid"
-                          borderColor="gray.200"
+                          borderColor={cardBorder}
                           _hover={{ borderColor: 'brand.300' }}
                           _focus={{
                             borderColor: 'brand.500',
@@ -233,15 +240,15 @@ const Login = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.5 }}
             >
-              <Card variant="outline" bg="blue.50" borderColor="blue.200">
+              <Card variant="outline" bg={useColorModeValue('blue.50', 'blue.900')} borderColor={useColorModeValue('blue.200', 'blue.700')}>
                 <CardBody>
                   <HStack spacing={3}>
                     <FaShieldAlt color="var(--chakra-colors-blue-500)" />
                     <VStack align="start" spacing={1}>
-                      <Text fontSize="sm" fontWeight="600" color="blue.800">
+                      <Text fontSize="sm" fontWeight="600" color={useColorModeValue('blue.800', 'blue.100')}>
                         Secure Login
                       </Text>
-                      <Text fontSize="xs" color="blue.600">
+                      <Text fontSize="xs" color={useColorModeValue('blue.600', 'blue.200')}>
                         Your login is protected with industry-standard encryption
                       </Text>
                     </VStack>
@@ -253,9 +260,9 @@ const Login = () => {
             {/* Back to Home */}
             <VStack spacing={2}>
               <Divider />
-              <Text fontSize="sm" color="gray.500" textAlign="center">
+              <Text fontSize="sm" color={useColorModeValue('gray.500', 'gray.300')} textAlign="center">
                 Not an admin?{' '}
-                <Link as={RouterLink} to="/" color="brand.500" fontWeight="600">
+                <Link as={RouterLink} to="/" color={useColorModeValue('brand.500', 'brand.200')} fontWeight="600">
                   Go back to home
                 </Link>
               </Text>
