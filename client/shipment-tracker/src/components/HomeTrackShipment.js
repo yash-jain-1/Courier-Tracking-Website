@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import axios from 'axios';
+import { fetchShipment } from '../services/api';
 import {
   Flex,
   Box,
@@ -40,7 +40,7 @@ const HomeTrackShipment = () => {
     setShipmentData(null);
     try {
       // Use the proxy for local dev, just like TrackShipment
-      const response = await axios.get(`/api/shipments/${trackingNumber}`);
+  const response = await fetchShipment(trackingNumber);
       setShipmentData(response.data);
     } catch (err) {
       setError(

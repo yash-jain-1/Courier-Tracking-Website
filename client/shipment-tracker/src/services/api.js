@@ -1,7 +1,8 @@
 // src/services/api.js
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_BASE; // Your backend URL
+const API_URL = 'https://courier-tracking-website.onrender.com/api'; // Your backend URL
+console.log("API URL:", API_URL);
 
 // Fetch shipment details
 export const fetchShipment = (trackingNumber) => {

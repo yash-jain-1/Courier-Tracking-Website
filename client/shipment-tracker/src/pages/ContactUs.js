@@ -121,7 +121,7 @@ const ContactUs = () => {
 
     try {
       // Replace with your actual contact form endpoint
-      await axios.post('/api/contact', formData);
+      await axios.post('/contact', formData);
       
       setSuccess(true);
       setFormData({

@@ -1,7 +1,7 @@
 // src/pages/ShipmentDetails.js
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import { fetchShipment } from '../services/api';
 
 const ShipmentDetails = () => {
     const { trackingNumber } = useParams(); // Get tracking number from URL params
@@ -11,7 +11,7 @@ const ShipmentDetails = () => {
     useEffect(() => {
         const fetchShipmentDetails = async () => {
             try {
-                const response = await axios.get(`/api/shipments/${trackingNumber}`);
+                const response = await fetchShipment(trackingNumber);
                 setShipment(response.data);
             } catch (err) {
                 setError('Shipment not found or error fetching data');

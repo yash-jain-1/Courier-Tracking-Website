@@ -62,7 +62,7 @@ import {
   FaSearch,
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { fetchAllShipments, addShipment, updateShipment } from '../services/api';
 
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
@@ -183,15 +183,13 @@ const AdminDashboard = () => {
     setLoading(true);
     try {
       // This endpoint would need to be implemented in the backend
-      const response = await axios.get('/api/admin/shipments', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-      setShipments(response.data);
+  const response = await fetchAllShipments({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+  setShipments(response.data);
     } catch (error) {
       console.error('Error fetching shipments:', error);
       toast({
         title: 'API Not Available',
-        description: 'Backend API "/api/admin/shipments" not found. Using mock data for demonstration.',
+        description: 'Backend API "/admin/shipments" not found. Using mock data for demonstration.',
         status: 'warning',
         duration: 4000,
         isClosable: true,
@@ -227,9 +225,7 @@ const AdminDashboard = () => {
   const handleCreateShipment = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/shipments', formData, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+  await addShipment(formData, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
       
       toast({
         title: 'Shipment Created',
@@ -257,12 +253,10 @@ const AdminDashboard = () => {
   const handleUpdateShipment = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`/api/shipments/${selectedShipment.trackingNumber}/updates`, {
+      await updateShipment(selectedShipment.trackingNumber, {
         status: formData.status,
         updateData: formData.updateData
-      }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
       
       toast({
         title: 'Shipment Updated',

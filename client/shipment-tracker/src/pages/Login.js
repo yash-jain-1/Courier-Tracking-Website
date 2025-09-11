@@ -27,7 +27,7 @@ import { motion } from 'framer-motion';
 import { ViewIcon, ViewOffIcon, LockIcon} from '@chakra-ui/icons';
 import { FaShieldAlt, FaUserShield } from 'react-icons/fa';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import axios from 'axios';
+import { adminLogin } from '../services/api';
 
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
@@ -65,7 +65,7 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await axios.post('/api/auth/login', {
+      const response = await adminLogin({
         username: formData.username,
         password: formData.password,
       });

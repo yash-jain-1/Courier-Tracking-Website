@@ -30,7 +30,7 @@ import {
   FaMapMarkerAlt,
   FaClock,
 } from 'react-icons/fa';
-import axios from 'axios';
+import { fetchShipment } from '../services/api';
 
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
@@ -188,10 +188,10 @@ const TrackShipment = () => {
       // For local development, the "proxy" field in package.json should point to your backend server (e.g., "http://localhost:5000").
       // In production, set REACT_APP_API_BASE_URL in your environment to your backend API base URL.
       // This ensures axios uses the correct base URL in both environments.
-      const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || '';
-      const response = await axios.get(
-        `${apiBaseUrl}/api/shipments/${trackingNumber}`
-      );
+      const apiBaseUrl = 'https://courier-tracking-website.onrender.com/api';
+      
+  const response = await fetchShipment(trackingNumber);
+
       setShipmentData(response.data);
       
       toast({
