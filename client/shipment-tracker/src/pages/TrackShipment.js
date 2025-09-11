@@ -188,7 +188,6 @@ const TrackShipment = () => {
       // For local development, the "proxy" field in package.json should point to your backend server (e.g., "http://localhost:5000").
       // In production, set REACT_APP_API_BASE_URL in your environment to your backend API base URL.
       // This ensures axios uses the correct base URL in both environments.
-      const apiBaseUrl = 'https://courier-tracking-website.onrender.com/api';
       
   const response = await fetchShipment(trackingNumber);
 
