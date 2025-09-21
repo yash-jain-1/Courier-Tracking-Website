@@ -97,6 +97,10 @@ app.post('/api/shipments/:trackingNumber/updates', async (req, res) => {
   }
 });
 
-// Define port
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Export app for testing; only start server if run directly
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+module.exports = app;
