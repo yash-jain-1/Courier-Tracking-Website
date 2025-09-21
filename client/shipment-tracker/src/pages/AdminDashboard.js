@@ -319,11 +319,18 @@ const AdminDashboard = () => {
     onUpdateOpen();
   };
 
-  const filteredShipments = shipments.filter(shipment => {
-    const matchesSearch = shipment.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || shipment.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredShipments = shipments
+    .filter(shipment => {
+      const matchesSearch = shipment.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || shipment.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      // Prefer updatedAt, fallback to createdAt
+      const dateA = new Date(a.updatedAt || a.createdAt);
+      const dateB = new Date(b.updatedAt || b.createdAt);
+      return dateB - dateA; // Descending (latest first)
+    });
 
   const handleLogout = () => {
     localStorage.removeItem('token');
