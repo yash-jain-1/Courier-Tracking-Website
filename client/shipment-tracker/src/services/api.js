@@ -20,7 +20,7 @@ export const addShipment = (shipmentData) => axios.post(`${API_URL}/shipments`, 
 // Update shipment details (add update)
 export const updateShipment = (trackingNumber, updateData) => axios.post(`${API_URL}/shipments/${trackingNumber}/updates`, updateData);
 
-// Fetch all shipments for admin
-export const fetchAllShipments = () => {
-  return axios.get(`${API_URL}/admin/shipments`);
+// Fetch all shipments for admin (with pagination support)
+export const fetchAllShipments = (options = {}) => {
+  return axios.get(`${API_URL}/admin/shipments`, options);
 };

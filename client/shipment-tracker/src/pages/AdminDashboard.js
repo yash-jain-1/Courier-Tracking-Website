@@ -148,10 +148,13 @@ const AdminDashboard = () => {
       date: new Date().toISOString().split('T')[0],
       time: new Date().toLocaleTimeString(),
       location: '',
-  status: '',
+      status: '',
       remarks: ''
     }
   });
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
   const { isOpen: isUpdateOpen, onOpen: onUpdateOpen, onClose: onUpdateClose } = useDisclosure();
@@ -174,17 +177,19 @@ const AdminDashboard = () => {
       navigate('/login');
       return;
     }
-
     fetchShipments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate]);
+  }, [navigate, page, limit]);
 
   const fetchShipments = async () => {
     setLoading(true);
     try {
-      // This endpoint would need to be implemented in the backend
-  const response = await fetchAllShipments({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-  setShipments(response.data);
+      // Pass page and limit as query params
+      const response = await fetchAllShipments({
+        params: { page, limit },
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      setShipments(response.data);
     } catch (error) {
       console.error('Error fetching shipments:', error);
       toast({
@@ -413,6 +418,21 @@ const AdminDashboard = () => {
                       <option value="delivered">Delivered</option>
                       <option value="delayed">Delayed</option>
                     </Select>
+                    {/* Limit selector */}
+                    <Select
+                      value={limit}
+                      onChange={e => {
+                        setLimit(Number(e.target.value));
+                        setPage(1); // Reset to first page when limit changes
+                      }}
+                      maxW="120px"
+                    >
+                      <option value={5}>5 / page</option>
+                      <option value={10}>10 / page</option>
+                      <option value={20}>20 / page</option>
+                      <option value={50}>50 / page</option>
+                      <option value={100}>100 / page</option>
+                    </Select>
                   </HStack>
                   <Button leftIcon={<FaDownload />} variant="outline" size="sm">
                     Export
@@ -434,66 +454,84 @@ const AdminDashboard = () => {
                     <Text color="gray.500">No shipments found</Text>
                   </Box>
                 ) : (
-                  <Table variant="simple">
-                    <Thead bg="gray.50">
-                      <Tr>
-                        <Th>Tracking Number</Th>
-                        <Th>Status</Th>
-                        <Th>Location</Th>
-                        <Th>Last Updated at</Th>
-                        <Th>Actions</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {filteredShipments.map((shipment) => (
-                        <Tr key={shipment._id} _hover={{ bg: 'gray.50' }}>
-                          <Td fontWeight="600" color="navy.800">
-                            {shipment.trackingNumber}
-                          </Td>
-                          <Td>
-                            <Badge
-                              colorScheme={getStatusColor(shipment.status)}
-                              variant="subtle"
-                              px={2}
-                              py={1}
-                            >
-                              {shipment.status?.toUpperCase()}
-                            </Badge>
-                          </Td>
-                          <Td color="gray.600">
-                            {shipment.location}
-                          </Td>
-                          <Td color="gray.600">
-                            {formatDateTime(shipment.updatedAt || shipment.createdAt)}
-                          </Td>
-                          <Td>
-                            <Menu>
-                              <MenuButton
-                                as={IconButton}
-                                icon={<FaEllipsisV />}
-                                variant="ghost"
-                                size="sm"
-                              />
-                              <MenuList>
-                                <MenuItem
-                                  icon={<FaEye />}
-                                  onClick={() => handleViewShipment(shipment)}
-                                >
-                                  View Details
-                                </MenuItem>
-                                <MenuItem
-                                  icon={<FaEdit />}
-                                  onClick={() => handleEditShipment(shipment)}
-                                >
-                                  Update Status
-                                </MenuItem>
-                              </MenuList>
-                            </Menu>
-                          </Td>
+                  <>
+                    <Table variant="simple">
+                      <Thead bg="gray.50">
+                        <Tr>
+                          <Th>Tracking Number</Th>
+                          <Th>Status</Th>
+                          <Th>Location</Th>
+                          <Th>Last Updated at</Th>
+                          <Th>Actions</Th>
                         </Tr>
-                      ))}
-                    </Tbody>
-                  </Table>
+                      </Thead>
+                      <Tbody>
+                        {filteredShipments.map((shipment) => (
+                          <Tr key={shipment._id} _hover={{ bg: 'gray.50' }}>
+                            <Td fontWeight="600" color="navy.800">
+                              {shipment.trackingNumber}
+                            </Td>
+                            <Td>
+                              <Badge
+                                colorScheme={getStatusColor(shipment.status)}
+                                variant="subtle"
+                                px={2}
+                                py={1}
+                              >
+                                {shipment.status?.toUpperCase()}
+                              </Badge>
+                            </Td>
+                            <Td color="gray.600">
+                              {shipment.location}
+                            </Td>
+                            <Td color="gray.600">
+                              {formatDateTime(shipment.updatedAt || shipment.createdAt)}
+                            </Td>
+                            <Td>
+                              <Menu>
+                                <MenuButton
+                                  as={IconButton}
+                                  icon={<FaEllipsisV />}
+                                  variant="ghost"
+                                  size="sm"
+                                />
+                                <MenuList>
+                                  <MenuItem
+                                    icon={<FaEye />}
+                                    onClick={() => handleViewShipment(shipment)}
+                                  >
+                                    View Details
+                                  </MenuItem>
+                                  <MenuItem
+                                    icon={<FaEdit />}
+                                    onClick={() => handleEditShipment(shipment)}
+                                  >
+                                    Update Status
+                                  </MenuItem>
+                                </MenuList>
+                              </Menu>
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                    {/* Pagination Controls */}
+                    <Flex justify="flex-end" align="center" p={4} gap={2}>
+                      {page > 1 && (
+                        <Button size="sm" onClick={() => setPage(page - 1)}>
+                          Prev
+                        </Button>
+                      )}
+                      <Text fontSize="sm" color="gray.600" mx={2}>
+                        Page {page}
+                      </Text>
+                      {shipments.length === limit && (
+                        <Button size="sm" onClick={() => setPage(page + 1)}>
+                          Next
+                        </Button>
+                      )}
+                    </Flex>
+                  </>
                 )}
               </CardBody>
             </Card>
