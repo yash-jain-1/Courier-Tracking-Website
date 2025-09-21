@@ -10,14 +10,12 @@ router.get('/shipments', async (req, res) => {
     const { page = 1, limit = 10 } = req.query; // Default to page 1 and 10 shipments per page
     try {
       let shipments;
+      const sortBy = { updatedAt: -1, createdAt: -1 };
       if (limit === 'all') {
-        shipments = await Shipment.find();
+        shipments = await Shipment.find().sort(sortBy);
       } else {
-        // Old code for reference:
-        // shipments = await Shipment.find()
-        //   .skip((page - 1) * limit)  // Skip previous pages
-        //   .limit(parseInt(limit));  // Limit the results per page
         shipments = await Shipment.find()
+          .sort(sortBy)
           .skip((page - 1) * limit)
           .limit(parseInt(limit));
       }
