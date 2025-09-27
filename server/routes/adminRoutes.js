@@ -26,4 +26,18 @@ router.get('/shipments', async (req, res) => {
     }
   });
 
+// Delete a shipment by tracking number
+router.delete('/shipments/:trackingNumber', async (req, res) => {
+  try {
+    const { trackingNumber } = req.params;
+    const deleted = await Shipment.findOneAndDelete({ trackingNumber });
+    if (!deleted) {
+      return res.status(404).json({ message: 'Shipment not found' });
+    }
+    res.json({ message: 'Shipment deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting shipment', error });
+  }
+});
+
 module.exports = router;

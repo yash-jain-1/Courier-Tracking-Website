@@ -62,7 +62,7 @@ import {
   FaSearch,
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { fetchAllShipments, addShipment, updateShipment } from '../services/api';
+import { fetchAllShipments, addShipment, updateShipment, deleteShipment } from '../services/api';
 
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
@@ -319,6 +319,30 @@ const AdminDashboard = () => {
     onUpdateOpen();
   };
 
+  const handleDeleteShipment = async (shipment) => {
+    if (!window.confirm(`Are you sure you want to delete shipment ${shipment.trackingNumber}?`)) return;
+    try {
+      await deleteShipment(shipment.trackingNumber, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      toast({
+        title: 'Shipment Deleted',
+        description: `Shipment ${shipment.trackingNumber} has been deleted.`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      fetchShipments();
+    } catch (error) {
+      console.error('Error deleting shipment:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete shipment. Please try again.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
   const filteredShipments = shipments
     .filter(shipment => {
       const matchesSearch = shipment.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase());
@@ -514,6 +538,13 @@ const AdminDashboard = () => {
                                     onClick={() => handleEditShipment(shipment)}
                                   >
                                     Update Status
+                                  </MenuItem>
+                                  <MenuItem
+                                    icon={<FaBoxOpen />}
+                                    onClick={() => handleDeleteShipment(shipment)}
+                                    color="red.500"
+                                  >
+                                    Delete Shipment
                                   </MenuItem>
                                 </MenuList>
                               </Menu>

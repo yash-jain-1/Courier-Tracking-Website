@@ -24,3 +24,7 @@ export const updateShipment = (trackingNumber, updateData) => axios.post(`${API_
 export const fetchAllShipments = (options = {}) => {
   return axios.get(`${API_URL}/admin/shipments`, options);
 };
+
+// Delete a shipment by tracking number (admin)
+export const deleteShipment = (trackingNumber, config) =>
+  axios.delete(`${API_URL}/admin/shipments/${trackingNumber}`, config);
