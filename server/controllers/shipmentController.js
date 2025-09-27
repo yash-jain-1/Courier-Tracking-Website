@@ -23,3 +23,16 @@ exports.updateShipment = async (req, res) => {
   const shipment = await Shipment.findByIdAndUpdate(id, { status, location }, { new: true });
   res.json(shipment);
 };
+
+exports.deleteShipment = async (req, res) => {
+  try {
+    const { trackingNumber } = req.params;
+    const deleted = await Shipment.findOneAndDelete({ trackingNumber });
+    if (!deleted) {
+      return res.status(404).json({ message: 'Shipment not found' });
+    }
+    res.json({ message: 'Shipment deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting shipment', error });
+  }
+};
