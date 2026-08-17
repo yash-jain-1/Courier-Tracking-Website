@@ -9,16 +9,18 @@ const adminRoutes = require('./routes/adminRoutes');  // Correct import
 
 const app = express();
 
-app.use(bodyParser.json());
-
 const cors = require('cors');
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "https://shanucourier.netlify.app"
+    "https://shanucourier.netlify.app",
+    "https://indoreparcel.in",
+    "https://www.indoreparcel.in"
   ],
   credentials: true
 }));
+
+app.use(bodyParser.json());
 // MongoDB connection string (ensure to handle this securely)
 const MONGO_URI = process.env.MONGO_URI;
 // TODO: Remove the connection string from the source code and move it to an environment variable
