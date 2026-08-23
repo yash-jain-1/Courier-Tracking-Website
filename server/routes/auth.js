@@ -7,11 +7,21 @@ const router = express.Router();
 require('dotenv').config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
+const REGISTER_SECRET = process.env.REGISTER_SECRET;
 
-// Register Route
+// Register Route — protected by REGISTER_SECRET header
 router.post('/register', async (req, res) => {
+    const secret = req.headers['x-register-secret'];
+    if (!secret || secret !== REGISTER_SECRET) {
+        return res.status(403).json({ error: 'Forbidden' });
+    }
     try {
         const { username, password } = req.body;
+        // Prevent duplicate users
+        const existing = await User.findOne({ username });
+        if (existing) {
+            return res.status(409).json({ error: 'Username already exists' });
+        }
         const user = new User({ username, password });
         await user.save();
         res.status(201).json({ message: 'User registered successfully' });
