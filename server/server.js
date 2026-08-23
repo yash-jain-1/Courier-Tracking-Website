@@ -102,7 +102,20 @@ app.post('/api/shipments/:trackingNumber/updates', async (req, res) => {
 // Export app for testing; only start server if run directly
 if (require.main === module) {
   const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+
+    // Keep-alive ping to prevent Render free tier from spinning down
+    const SELF_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+    setInterval(() => {
+      const http = SELF_URL.startsWith('https') ? require('https') : require('http');
+      http.get(`${SELF_URL}/`, (res) => {
+        console.log(`Keep-alive ping: ${res.statusCode}`);
+      }).on('error', (err) => {
+        console.error('Keep-alive ping failed:', err.message);
+      });
+    }, 14 * 60 * 1000); // every 14 minutes
+  });
 }
 
 module.exports = app;
