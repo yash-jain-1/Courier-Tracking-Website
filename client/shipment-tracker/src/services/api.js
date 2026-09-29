@@ -15,10 +15,10 @@ export const adminLogin = (credentials) => {
 };
 
 // Add a new shipment
-export const addShipment = (shipmentData) => axios.post(`${API_URL}/shipments`, shipmentData);
+export const addShipment = (shipmentData, config) => axios.post(`${API_URL}/shipments`, shipmentData, config);
 
 // Update shipment details (add update)
-export const updateShipment = (trackingNumber, updateData) => axios.post(`${API_URL}/shipments/${trackingNumber}/updates`, updateData);
+export const updateShipment = (trackingNumber, updateData, config) => axios.post(`${API_URL}/shipments/${trackingNumber}/updates`, updateData, config);
 
 // Fetch all shipments for admin (with pagination support)
 export const fetchAllShipments = (options = {}) => {
