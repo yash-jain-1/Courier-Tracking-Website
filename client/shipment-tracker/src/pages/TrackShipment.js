@@ -86,9 +86,12 @@ const getProgressValue = (status) => {
 const TrackingTimeline = ({ updates }) => {
   if (!updates || updates.length === 0) return null;
 
+  // Updates are stored oldest-first; show newest first so index 0 is the latest
+  const sortedUpdates = [...updates].reverse();
+
   return (
     <VStack align="stretch" spacing={4} w="full">
-      {updates.map((update, index) => (
+      {sortedUpdates.map((update, index) => (
         <MotionBox
           key={update._id}
           initial={{ opacity: 0, x: -20 }}
@@ -106,7 +109,7 @@ const TrackingTimeline = ({ updates }) => {
                 border="2px solid white"
                 shadow="sm"
               />
-              {index < updates.length - 1 && (
+              {index < sortedUpdates.length - 1 && (
                 <Box w="2px" h={8} bg="gray.200" />
               )}
             </VStack>
@@ -118,7 +121,7 @@ const TrackingTimeline = ({ updates }) => {
                   <VStack align="start" spacing={2}>
                     <HStack justify="space-between" w="full">
                       <Text fontWeight="600" color="navy.800" fontSize="sm">
-                        {update.activity}
+                        {update.status}
                       </Text>
                       <Badge
                         colorScheme={index === 0 ? 'blue' : 'gray'}

@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const Shipment = require('./models/Shipment');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/adminRoutes');  // Correct import
+const { protect } = require('./middlewares/authMiddleware');
 
 const app = express();
 
@@ -41,7 +42,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/auth', authRoutes);
 
 // Add a new shipment
-app.post('/api/shipments', async (req, res) => {
+app.post('/api/shipments', protect, async (req, res) => {
   try {
     const shipment = new Shipment({
       trackingNumber: req.body.trackingNumber,
@@ -68,7 +69,7 @@ app.get('/api/shipments/:trackingNumber', async (req, res) => {
 });
 
 // Update a shipment with new status
-app.post('/api/shipments/:trackingNumber/updates', async (req, res) => {
+app.post('/api/shipments/:trackingNumber/updates', protect, async (req, res) => {
   try {
     const { trackingNumber } = req.params;
     const { status, updateData } = req.body;

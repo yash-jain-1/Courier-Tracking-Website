@@ -87,8 +87,10 @@ describe('Shipment API', () => {
 
   it('should add a new shipment', async () => {
     Shipment.__saveMock.mockResolvedValueOnce();
+    jwt.verify.mockReturnValue({ id: '123' });
     const res = await request(app)
       .post('/api/shipments')
+      .set('Authorization', 'Bearer fake-jwt-token')
       .send({ trackingNumber: 'NEW123', status: 'Created', location: 'Mumbai' });
     expect(res.statusCode).toBe(201);
     expect(res.body.trackingNumber).toBe('NEW123');
@@ -98,11 +100,21 @@ describe('Shipment API', () => {
     const updatedShipment = { trackingNumber: 'ABC123', status: 'Delivered', location: 'Pune', updates: [] };
     Shipment.findOne.mockResolvedValue(updatedShipment);
     updatedShipment.save = jest.fn().mockResolvedValue(updatedShipment);
+    jwt.verify.mockReturnValue({ id: '123' });
     const res = await request(app)
       .post('/api/shipments/ABC123/updates')
+      .set('Authorization', 'Bearer fake-jwt-token')
       .send({ status: 'Delivered', updateData: { date: '2025-09-21', time: '10:00', location: 'Pune', status: 'Delivered' } });
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toBe('Shipment updated successfully');
     expect(res.body.shipment.status).toBe('Delivered');
+  });
+
+  it('should reject shipment updates without a token', async () => {
+    const res = await request(app)
+      .post('/api/shipments/ABC123/updates')
+      .send({ status: 'Delivered' });
+    expect(res.statusCode).toBe(401);
+    expect(Shipment.findOne).not.toHaveBeenCalled();
   });
 });
