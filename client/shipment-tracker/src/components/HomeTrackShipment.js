@@ -63,9 +63,9 @@ const HomeTrackShipment = () => {
                 value={trackingNumber}
                 onChange={handleInputChange}
                 size="lg"
-                bg="white"
+                bg="bg.input"
                 border="2px solid"
-                borderColor="gray.200"
+                borderColor="border.subtle"
                 _hover={{ borderColor: 'brand.300' }}
                 _focus={{
                   borderColor: 'brand.500',
@@ -84,14 +84,14 @@ const HomeTrackShipment = () => {
                 Track
               </Button>
             </HStack>
-            <Text fontSize="sm" color="gray.500" textAlign="center">
+            <Text fontSize="sm" color="fg.subtle" textAlign="center">
               Enter your 10-12 digit tracking number to get real-time updates
             </Text>
           </VStack>
           {/* Results Section */}
           {error && (
-            <Box bg="red.50" p={2} rounded="md">
-              <Text color="red.500" fontSize="sm">{error}</Text>
+            <Box bg="red.50" _dark={{ bg: "red.900" }} p={2} rounded="md">
+              <Text color="red.500" _dark={{ color: "red.200" }} fontSize="sm">{error}</Text>
             </Box>
           )}
           {shipmentData && (
@@ -100,10 +100,10 @@ const HomeTrackShipment = () => {
                 <VStack spacing={4} align="stretch">
                   <HStack justify="space-between" align="start">
                     <VStack align="start" spacing={1}>
-                      <Text fontSize="sm" color="gray.600" fontWeight="500">
+                      <Text fontSize="sm" color="fg.muted" fontWeight="500">
                         TRACKING NUMBER
                       </Text>
-                      <Text fontSize="lg" fontWeight="bold" color="navy.800">
+                      <Text fontSize="lg" fontWeight="bold" color="fg.heading">
                         {shipmentData.trackingNumber?.toUpperCase()}
                       </Text>
                     </VStack>
@@ -124,12 +124,12 @@ const HomeTrackShipment = () => {
                   <Divider />
                   <HStack spacing={6}>
                     <VStack align="start" spacing={1}>
-                      <Text fontSize="sm" color="gray.600" fontWeight="500">
+                      <Text fontSize="sm" color="fg.muted" fontWeight="500">
                         CURRENT LOCATION
                       </Text>
                       <HStack>
                         <Icon as={FaMapMarkerAlt} color="brand.500" />
-                        <Text fontWeight="600" color="navy.800">
+                        <Text fontWeight="600" color="fg.heading">
                           {shipmentData.location}
                         </Text>
                       </HStack>
@@ -137,7 +137,7 @@ const HomeTrackShipment = () => {
                   </HStack>
                   {/* Progress Bar */}
                   <VStack align="stretch" spacing={2}>
-                    <Text fontSize="sm" color="gray.600" fontWeight="500">
+                    <Text fontSize="sm" color="fg.muted" fontWeight="500">
                       DELIVERY PROGRESS
                     </Text>
                     <Progress
@@ -145,9 +145,9 @@ const HomeTrackShipment = () => {
                       colorScheme="brand"
                       size="lg"
                       rounded="full"
-                      bg="gray.200"
+                      bg="bg.track"
                     />
-                    <HStack justify="space-between" fontSize="xs" color="gray.500">
+                    <HStack justify="space-between" fontSize="xs" color="fg.subtle">
                       <Text>Picked Up</Text>
                       <Text>In Transit</Text>
                       <Text>Out for Delivery</Text>

@@ -160,7 +160,7 @@ const Login = () => {
                     )}
 
                     <FormControl isRequired>
-                      <FormLabel color="gray.700" fontWeight="600">
+                      <FormLabel color="fg.body" fontWeight="600">
                         Username
                       </FormLabel>
                       <InputGroup>
@@ -187,7 +187,7 @@ const Login = () => {
                     </FormControl>
 
                     <FormControl isRequired>
-                      <FormLabel color="gray.700" fontWeight="600">
+                      <FormLabel color="fg.body" fontWeight="600">
                         Password
                       </FormLabel>
                       <InputGroup>

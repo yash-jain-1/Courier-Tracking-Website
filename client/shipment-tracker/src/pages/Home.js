@@ -229,12 +229,12 @@ const Home = () => {
               transition={{ duration: 0.8, delay: 0.3 }}
             >
               <Box
-                bg="white"
+                bg="bg.surface"
                 p={8}
                 rounded="2xl"
                 shadow="xl"
                 border="1px solid"
-                borderColor="gray.200"
+                borderColor="border.subtle"
               >
                 <VStack spacing={6} align="stretch">
                   <VStack spacing={2}>

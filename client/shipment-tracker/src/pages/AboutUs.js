@@ -46,10 +46,10 @@ const ValueCard = ({ icon, title, description }) => (
         <Box p={4} bg="brand.100" rounded="full">
           <Icon as={icon} w={8} h={8} color="brand.500" />
         </Box>
-        <Heading size="md" color="navy.800">
+        <Heading size="md" color="fg.heading">
           {title}
         </Heading>
-        <Text color="gray.600" fontSize="sm">
+        <Text color="fg.muted" fontSize="sm">
           {description}
         </Text>
       </VStack>
@@ -67,14 +67,14 @@ const StatCard = ({ icon, number, label, description }) => (
       <Stat>
         <Flex align="center" mb={2}>
           <Icon as={icon} color="brand.500" mr={2} />
-          <StatLabel fontSize="sm" color="gray.600" fontWeight="600">
+          <StatLabel fontSize="sm" color="fg.muted" fontWeight="600">
             {label}
           </StatLabel>
         </Flex>
-        <StatNumber fontSize="2xl" color="navy.800" fontWeight="bold">
+        <StatNumber fontSize="2xl" color="fg.heading" fontWeight="bold">
           {number}
         </StatNumber>
-        <StatHelpText fontSize="xs" color="gray.500">
+        <StatHelpText fontSize="xs" color="fg.subtle">
           {description}
         </StatHelpText>
       </Stat>
@@ -90,7 +90,7 @@ const TimelineItem = ({ year, title, description, isLast = false }) => (
         h={4}
         rounded="full"
         bg="brand.500"
-        border="2px solid white"
+        border="2px solid" borderColor="bg.surface"
         shadow="md"
       />
       {!isLast && <Box w="2px" h={16} bg="gray.300" />}
@@ -99,10 +99,10 @@ const TimelineItem = ({ year, title, description, isLast = false }) => (
       <Badge colorScheme="blue" variant="solid" px={3} py={1} rounded="full">
         {year}
       </Badge>
-      <Heading size="sm" color="navy.800">
+      <Heading size="sm" color="fg.heading">
         {title}
       </Heading>
-      <Text fontSize="sm" color="gray.600">
+      <Text fontSize="sm" color="fg.muted">
         {description}
       </Text>
     </VStack>
@@ -254,7 +254,7 @@ const AboutUs = () => {
       </Container>
 
       {/* Mission Section */}
-      <Box bg="white" py={16}>
+      <Box bg="bg.surface" py={16}>
         <Container maxW="7xl">
           <MotionBox
             initial={{ opacity: 0, y: 30 }}
@@ -264,10 +264,10 @@ const AboutUs = () => {
           >
             <VStack spacing={12}>
               <VStack spacing={4} textAlign="center">
-                <Heading fontSize="3xl" color="navy.800">
+                <Heading fontSize="3xl" color="fg.heading">
                   Our Mission & Vision
                 </Heading>
-                <Text fontSize="lg" color="gray.600" maxW="3xl">
+                <Text fontSize="lg" color="fg.muted" maxW="3xl">
                   To revolutionize logistics in India by providing reliable, technology-driven 
                   courier services that connect every corner of the nation.
                 </Text>
@@ -279,11 +279,11 @@ const AboutUs = () => {
                     <VStack align="start" spacing={4}>
                       <HStack>
                         <Icon as={FaHeart} color="brand.500" w={6} h={6} />
-                        <Heading size="lg" color="navy.800">
+                        <Heading size="lg" color="fg.heading">
                           Our Mission
                         </Heading>
                       </HStack>
-                      <Text color="gray.700">
+                      <Text color="fg.body">
                         To provide exceptional courier and logistics services that exceed customer 
                         expectations through innovation, reliability, and personalized care. We strive 
                         to make shipping seamless, affordable, and accessible for everyone.
@@ -297,11 +297,11 @@ const AboutUs = () => {
                     <VStack align="start" spacing={4}>
                       <HStack>
                         <Icon as={FaGlobe} color="navy.500" w={6} h={6} />
-                        <Heading size="lg" color="navy.800">
+                        <Heading size="lg" color="fg.heading">
                           Our Vision
                         </Heading>
                       </HStack>
-                      <Text color="gray.700">
+                      <Text color="fg.body">
                         To become India's most trusted and innovative logistics partner, connecting 
                         businesses and individuals across the country while setting new standards 
                         for speed, security, and customer satisfaction.
@@ -325,10 +325,10 @@ const AboutUs = () => {
         >
           <VStack spacing={12}>
             <VStack spacing={4} textAlign="center">
-              <Heading fontSize="3xl" color="navy.800">
+              <Heading fontSize="3xl" color="fg.heading">
                 Our Core Values
               </Heading>
-              <Text fontSize="lg" color="gray.600" maxW="3xl">
+              <Text fontSize="lg" color="fg.muted" maxW="3xl">
                 The principles that guide everything we do and shape our commitment to excellence.
               </Text>
             </VStack>
@@ -351,7 +351,7 @@ const AboutUs = () => {
       </Container>
 
       {/* Timeline Section */}
-      <Box bg="white" py={16}>
+      <Box bg="bg.surface" py={16}>
         <Container maxW="5xl">
           <MotionBox
             initial={{ opacity: 0, y: 30 }}
@@ -361,10 +361,10 @@ const AboutUs = () => {
           >
             <VStack spacing={12}>
               <VStack spacing={4} textAlign="center">
-                <Heading fontSize="3xl" color="navy.800">
+                <Heading fontSize="3xl" color="fg.heading">
                   Our Journey
                 </Heading>
-                <Text fontSize="lg" color="gray.600" maxW="3xl">
+                <Text fontSize="lg" color="fg.muted" maxW="3xl">
                   From humble beginnings to becoming a trusted logistics partner across India.
                 </Text>
               </VStack>

@@ -106,11 +106,11 @@ const TrackingTimeline = ({ updates }) => {
                 h={4}
                 rounded="full"
                 bg={index === 0 ? 'brand.500' : 'gray.300'}
-                border="2px solid white"
+                border="2px solid" borderColor="bg.surface"
                 shadow="sm"
               />
               {index < sortedUpdates.length - 1 && (
-                <Box w="2px" h={8} bg="gray.200" />
+                <Box w="2px" h={8} bg="bg.track" />
               )}
             </VStack>
 
@@ -120,7 +120,7 @@ const TrackingTimeline = ({ updates }) => {
                 <CardBody>
                   <VStack align="start" spacing={2}>
                     <HStack justify="space-between" w="full">
-                      <Text fontWeight="600" color="navy.800" fontSize="sm">
+                      <Text fontWeight="600" color="fg.heading" fontSize="sm">
                         {update.status}
                       </Text>
                       <Badge
@@ -132,7 +132,7 @@ const TrackingTimeline = ({ updates }) => {
                       </Badge>
                     </HStack>
                     
-                    <HStack spacing={4} fontSize="xs" color="gray.600">
+                    <HStack spacing={4} fontSize="xs" color="fg.muted">
                       <HStack>
                         <Icon as={FaMapMarkerAlt} />
                         <Text>{update.location}</Text>
@@ -144,7 +144,7 @@ const TrackingTimeline = ({ updates }) => {
                     </HStack>
                     
                     {update.remarks && (
-                      <Text fontSize="sm" color="gray.600">
+                      <Text fontSize="sm" color="fg.muted">
                         {update.remarks}
                       </Text>
                     )}
@@ -238,9 +238,9 @@ const TrackShipment = () => {
               onChange={handleInputChange}
               onKeyPress={handleKeyPress}
               size="lg"
-              bg="white"
+              bg="bg.input"
               border="2px solid"
-              borderColor="gray.200"
+              borderColor="border.subtle"
               _hover={{ borderColor: 'brand.300' }}
               _focus={{
                 borderColor: 'brand.500',
@@ -260,7 +260,7 @@ const TrackShipment = () => {
             </Button>
           </HStack>
 
-          <Text fontSize="sm" color="gray.500" textAlign="center">
+          <Text fontSize="sm" color="fg.subtle" textAlign="center">
             Enter your 10-12 digit tracking number to get real-time updates
           </Text>
         </VStack>
@@ -300,10 +300,10 @@ const TrackShipment = () => {
                     <VStack spacing={4} align="stretch">
                       <HStack justify="space-between" align="start">
                         <VStack align="start" spacing={1}>
-                          <Text fontSize="sm" color="gray.600" fontWeight="500">
+                          <Text fontSize="sm" color="fg.muted" fontWeight="500">
                             TRACKING NUMBER
                           </Text>
-                          <Text fontSize="lg" fontWeight="bold" color="navy.800">
+                          <Text fontSize="lg" fontWeight="bold" color="fg.heading">
                             {trackingNumber.toUpperCase()}
                           </Text>
                         </VStack>
@@ -328,12 +328,12 @@ const TrackShipment = () => {
 
                       <HStack spacing={6}>
                         <VStack align="start" spacing={1}>
-                          <Text fontSize="sm" color="gray.600" fontWeight="500">
+                          <Text fontSize="sm" color="fg.muted" fontWeight="500">
                             CURRENT LOCATION
                           </Text>
                           <HStack>
                             <Icon as={FaMapMarkerAlt} color="brand.500" />
-                            <Text fontWeight="600" color="navy.800">
+                            <Text fontWeight="600" color="fg.heading">
                               {shipmentData.location}
                             </Text>
                           </HStack>
@@ -342,7 +342,7 @@ const TrackShipment = () => {
 
                       {/* Progress Bar */}
                       <VStack align="stretch" spacing={2}>
-                        <Text fontSize="sm" color="gray.600" fontWeight="500">
+                        <Text fontSize="sm" color="fg.muted" fontWeight="500">
                           DELIVERY PROGRESS
                         </Text>
                         <Progress
@@ -350,9 +350,9 @@ const TrackShipment = () => {
                           colorScheme="brand"
                           size="lg"
                           rounded="full"
-                          bg="gray.200"
+                          bg="bg.track"
                         />
-                        <HStack justify="space-between" fontSize="xs" color="gray.500">
+                        <HStack justify="space-between" fontSize="xs" color="fg.subtle">
                           <Text>Picked Up</Text>
                           <Text>In Transit</Text>
                           <Text>Out for Delivery</Text>
@@ -373,7 +373,7 @@ const TrackShipment = () => {
                   >
                     <CardBody>
                       <VStack align="stretch" spacing={4}>
-                        <Heading size="md" color="navy.800">
+                        <Heading size="md" color="fg.heading">
                           Shipment Timeline
                         </Heading>
                         <Divider />
