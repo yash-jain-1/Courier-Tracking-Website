@@ -55,10 +55,10 @@ const ContactCard = ({ icon, title, info, link, linkText }) => (
         <Box p={4} bg="brand.100" rounded="full">
           <Icon as={icon} w={8} h={8} color="brand.500" />
         </Box>
-        <Heading size="md" color="navy.800">
+        <Heading size="md" color="fg.heading">
           {title}
         </Heading>
-        <Text color="gray.600" fontSize="sm">
+        <Text color="fg.muted" fontSize="sm">
           {info}
         </Text>
         {link && (
@@ -225,10 +225,10 @@ const ContactUs = () => {
         >
           <VStack spacing={8}>
             <VStack spacing={4} textAlign="center">
-              <Heading fontSize="2xl" color="navy.800">
+              <Heading fontSize="2xl" color="fg.heading">
                 Contact Information
               </Heading>
-              <Text color="gray.600" maxW="2xl">
+              <Text color="fg.muted" maxW="2xl">
                 Reach out to us through any of the following channels. Our team is ready 
                 to assist you with all your courier and logistics needs.
               </Text>
@@ -263,10 +263,10 @@ const ContactUs = () => {
               <CardBody p={8}>
                 <VStack spacing={6} align="stretch">
                   <VStack spacing={2} align="start">
-                    <Heading size="lg" color="navy.800">
+                    <Heading size="lg" color="fg.heading">
                       Send us a Message
                     </Heading>
-                    <Text color="gray.600">
+                    <Text color="fg.muted">
                       Fill out the form below and we'll get back to you as soon as possible.
                     </Text>
                   </VStack>
@@ -289,7 +289,7 @@ const ContactUs = () => {
                     <VStack spacing={4}>
                       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
                         <FormControl isRequired>
-                          <FormLabel color="gray.700" fontWeight="600">
+                          <FormLabel color="fg.body" fontWeight="600">
                             Full Name
                           </FormLabel>
                           <Input
@@ -297,13 +297,13 @@ const ContactUs = () => {
                             placeholder="Enter your full name"
                             value={formData.name}
                             onChange={handleInputChange}
-                            bg="white"
+                            bg="bg.input"
                             disabled={loading}
                           />
                         </FormControl>
 
                         <FormControl isRequired>
-                          <FormLabel color="gray.700" fontWeight="600">
+                          <FormLabel color="fg.body" fontWeight="600">
                             Email Address
                           </FormLabel>
                           <Input
@@ -312,7 +312,7 @@ const ContactUs = () => {
                             placeholder="Enter your email"
                             value={formData.email}
                             onChange={handleInputChange}
-                            bg="white"
+                            bg="bg.input"
                             disabled={loading}
                           />
                         </FormControl>
@@ -320,7 +320,7 @@ const ContactUs = () => {
 
                       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
                         <FormControl>
-                          <FormLabel color="gray.700" fontWeight="600">
+                          <FormLabel color="fg.body" fontWeight="600">
                             Phone Number
                           </FormLabel>
                           <Input
@@ -329,13 +329,13 @@ const ContactUs = () => {
                             placeholder="Enter your phone number"
                             value={formData.phone}
                             onChange={handleInputChange}
-                            bg="white"
+                            bg="bg.input"
                             disabled={loading}
                           />
                         </FormControl>
 
                         <FormControl>
-                          <FormLabel color="gray.700" fontWeight="600">
+                          <FormLabel color="fg.body" fontWeight="600">
                             Subject
                           </FormLabel>
                           <Input
@@ -343,14 +343,14 @@ const ContactUs = () => {
                             placeholder="What's this about?"
                             value={formData.subject}
                             onChange={handleInputChange}
-                            bg="white"
+                            bg="bg.input"
                             disabled={loading}
                           />
                         </FormControl>
                       </SimpleGrid>
 
                       <FormControl isRequired>
-                        <FormLabel color="gray.700" fontWeight="600">
+                        <FormLabel color="fg.body" fontWeight="600">
                           Message
                         </FormLabel>
                         <Textarea
@@ -359,7 +359,7 @@ const ContactUs = () => {
                           rows={6}
                           value={formData.message}
                           onChange={handleInputChange}
-                          bg="white"
+                          bg="bg.input"
                           disabled={loading}
                           resize="vertical"
                         />
@@ -427,10 +427,10 @@ const ContactUs = () => {
               <Card variant="elevated" bg="brand.50" borderColor="brand.200" w="full">
                 <CardBody p={6}>
                   <VStack spacing={4}>
-                    <Heading size="md" color="navy.800">
+                    <Heading size="md" color="fg.heading">
                       Need Immediate Help?
                     </Heading>
-                    <Text fontSize="sm" color="gray.600" textAlign="center">
+                    <Text fontSize="sm" color="fg.muted" textAlign="center">
                       For urgent queries or tracking issues, call our 24/7 helpline
                     </Text>
                     <Button
@@ -450,24 +450,24 @@ const ContactUs = () => {
               <Card variant="outline" w="full">
                 <CardBody p={6}>
                   <VStack spacing={4}>
-                    <Heading size="md" color="navy.800">
+                    <Heading size="md" color="fg.heading">
                       Follow Us
                     </Heading>
-                    <Text fontSize="sm" color="gray.600" textAlign="center">
+                    <Text fontSize="sm" color="fg.muted" textAlign="center">
                       Stay connected for updates and offers
                     </Text>
                     <HStack spacing={4}>
                       <Link href="#" _hover={{ color: 'brand.500' }}>
-                        <Icon as={FaFacebook} w={6} h={6} color="gray.500" />
+                        <Icon as={FaFacebook} w={6} h={6} color="fg.subtle" />
                       </Link>
                       <Link href="#" _hover={{ color: 'brand.500' }}>
-                        <Icon as={FaTwitter} w={6} h={6} color="gray.500" />
+                        <Icon as={FaTwitter} w={6} h={6} color="fg.subtle" />
                       </Link>
                       <Link href="#" _hover={{ color: 'brand.500' }}>
-                        <Icon as={FaInstagram} w={6} h={6} color="gray.500" />
+                        <Icon as={FaInstagram} w={6} h={6} color="fg.subtle" />
                       </Link>
                       <Link href="#" _hover={{ color: 'brand.500' }}>
-                        <Icon as={FaLinkedin} w={6} h={6} color="gray.500" />
+                        <Icon as={FaLinkedin} w={6} h={6} color="fg.subtle" />
                       </Link>
                     </HStack>
                   </VStack>

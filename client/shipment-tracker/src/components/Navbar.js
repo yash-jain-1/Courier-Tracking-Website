@@ -142,7 +142,7 @@ const Navbar = () => {
                 >
                   <FaUser size="14" />
                 </MenuButton>
-                <MenuList bg="white" borderColor="gray.200">
+                <MenuList bg="bg.surface" borderColor="border.subtle">
                   <MenuItem
                     as={RouterLink}
                     to="/admin"
@@ -152,7 +152,7 @@ const Navbar = () => {
                   </MenuItem>
                   <MenuItem
                     onClick={handleLogout}
-                    _hover={{ bg: 'red.50', color: 'red.500' }}
+                    _hover={{ bg: 'red.50', color: 'red.500', _dark: { bg: 'whiteAlpha.100', color: 'red.300' } }}
                   >
                     Logout
                   </MenuItem>

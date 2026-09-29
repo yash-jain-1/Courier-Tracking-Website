@@ -77,10 +77,10 @@ const StatCard = ({ icon, label, number, percentage, isPositive = true }) => (
       <Stat>
         <Flex justify="space-between" align="start">
           <Box>
-            <StatLabel color="gray.600" fontSize="sm" fontWeight="600">
+            <StatLabel color="fg.muted" fontSize="sm" fontWeight="600">
               {label}
             </StatLabel>
-            <StatNumber fontSize="2xl" color="navy.800" fontWeight="bold">
+            <StatNumber fontSize="2xl" color="fg.heading" fontWeight="bold">
               {number}
             </StatNumber>
             {percentage && (
@@ -385,10 +385,10 @@ const AdminDashboard = () => {
             {/* Header */}
             <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
               <VStack align="start" spacing={1}>
-                <Heading fontSize="2xl" color="navy.800">
+                <Heading fontSize="2xl" color="fg.heading">
                   Admin Dashboard
                 </Heading>
-                <Text color="gray.600">
+                <Text color="fg.muted">
                   Manage shipments and track deliveries
                 </Text>
               </VStack>
@@ -475,14 +475,14 @@ const AdminDashboard = () => {
             {/* Shipments Table */}
             <Card variant="elevated">
               <CardHeader>
-                <Heading size="md" color="navy.800">
+                <Heading size="md" color="fg.heading">
                   Recent Shipments
                 </Heading>
               </CardHeader>
               <CardBody p={0}>
                 {filteredShipments.length === 0 ? (
                   <Box p={8} textAlign="center">
-                    <Text color="gray.500">No shipments found</Text>
+                    <Text color="fg.subtle">No shipments found</Text>
                   </Box>
                 ) : (
                   <>
@@ -499,7 +499,7 @@ const AdminDashboard = () => {
                       <Tbody>
                         {filteredShipments.map((shipment) => (
                           <Tr key={shipment._id} _hover={{ bg: 'gray.50' }}>
-                            <Td fontWeight="600" color="navy.800">
+                            <Td fontWeight="600" color="fg.heading">
                               {shipment.trackingNumber}
                             </Td>
                             <Td>
@@ -512,10 +512,10 @@ const AdminDashboard = () => {
                                 {shipment.status?.toUpperCase()}
                               </Badge>
                             </Td>
-                            <Td color="gray.600">
+                            <Td color="fg.muted">
                               {shipment.location}
                             </Td>
-                            <Td color="gray.600">
+                            <Td color="fg.muted">
                               {formatDateTime(shipment.updatedAt || shipment.createdAt)}
                             </Td>
                             <Td>
@@ -560,7 +560,7 @@ const AdminDashboard = () => {
                           Prev
                         </Button>
                       )}
-                      <Text fontSize="sm" color="gray.600" mx={2}>
+                      <Text fontSize="sm" color="fg.muted" mx={2}>
                         Page {page}
                       </Text>
                       {shipments.length === limit && (
@@ -706,19 +706,19 @@ const AdminDashboard = () => {
               {selectedShipment && (
                 <VStack spacing={4} align="stretch">
                   <Box>
-                    <Text fontSize="sm" color="gray.600" fontWeight="600">TRACKING NUMBER</Text>
+                    <Text fontSize="sm" color="fg.muted" fontWeight="600">TRACKING NUMBER</Text>
                     <Text fontSize="lg" fontWeight="bold">{selectedShipment.trackingNumber}</Text>
                   </Box>
                   <Divider />
                   <HStack justify="space-between">
                     <Box>
-                      <Text fontSize="sm" color="gray.600" fontWeight="600">STATUS</Text>
+                      <Text fontSize="sm" color="fg.muted" fontWeight="600">STATUS</Text>
                       <Badge colorScheme={getStatusColor(selectedShipment.status)} variant="solid">
                         {selectedShipment.status?.toUpperCase()}
                       </Badge>
                     </Box>
                     <Box>
-                      <Text fontSize="sm" color="gray.600" fontWeight="600">LOCATION</Text>
+                      <Text fontSize="sm" color="fg.muted" fontWeight="600">LOCATION</Text>
                       <Text fontWeight="600">{selectedShipment.location}</Text>
                     </Box>
                   </HStack>
@@ -726,19 +726,19 @@ const AdminDashboard = () => {
                     <>
                       <Divider />
                       <Box>
-                        <Text fontSize="sm" color="gray.600" fontWeight="600" mb={2}>UPDATES</Text>
+                        <Text fontSize="sm" color="fg.muted" fontWeight="600" mb={2}>UPDATES</Text>
                         <VStack spacing={2} align="stretch">
                           {selectedShipment.updates.map((update, index) => (
                             <Box key={index} p={3} bg="gray.50" rounded="lg">
                               <HStack justify="space-between" mb={1}>
                                 <Text fontSize="sm" fontWeight="600">{update.status}</Text>
-                                <Text fontSize="xs" color="gray.500">{update.date}</Text>
+                                <Text fontSize="xs" color="fg.subtle">{update.date}</Text>
                               </HStack>
-                              <Text fontSize="xs" color="gray.600">
+                              <Text fontSize="xs" color="fg.muted">
                                 {update.location} • {update.time}
                               </Text>
                               {update.remarks && (
-                                <Text fontSize="xs" color="gray.500" mt={1}>{update.remarks}</Text>
+                                <Text fontSize="xs" color="fg.subtle" mt={1}>{update.remarks}</Text>
                               )}
                             </Box>
                           ))}
