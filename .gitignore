@@ -2,6 +2,7 @@
 /client/shipment-tracker/.env
 
 # Environment files (secrets)
-.env
+/client/shipment-tracker/.env
+/server/.env
 .env.*
 !.env.example
