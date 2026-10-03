@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   Container,
@@ -8,7 +8,6 @@ import {
   StatLabel,
   StatNumber,
   StatHelpText,
-  StatArrow,
   HStack,
   VStack,
   SimpleGrid,
@@ -16,6 +15,7 @@ import {
   CardBody,
   CardHeader,
   Table,
+  TableContainer,
   Thead,
   Tbody,
   Tr,
@@ -31,7 +31,6 @@ import {
   MenuItem,
   useDisclosure,
   Badge,
-  useColorModeValue,
   Flex,
   IconButton,
   Modal,
@@ -43,9 +42,21 @@ import {
   ModalFooter,
   FormControl,
   FormLabel,
+  FormHelperText,
   Input,
+  InputGroup,
+  InputLeftElement,
   Divider,
   Textarea,
+  Alert,
+  AlertIcon,
+  AlertDescription,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
 } from '@chakra-ui/react';
 
 import { motion } from 'framer-motion';
@@ -55,19 +66,40 @@ import {
   FaEye,
   FaTruck,
   FaBoxOpen,
-  FaUsers,
   FaChartLine,
   FaEllipsisV,
   FaDownload,
   FaSearch,
+  FaTrash,
+  FaExclamationTriangle,
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { fetchAllShipments, addShipment, updateShipment, deleteShipment } from '../services/api';
+import {
+  fetchAllShipments,
+  fetchShipmentStats,
+  addShipment,
+  updateShipment,
+  deleteShipment,
+  getErrorMessage,
+} from '../services/api';
+import { clearToken } from '../utils/auth';
+import TrackingTimeline from '../components/TrackingTimeline';
+import {
+  STATUS_OPTIONS,
+  formatStatus,
+  formatDateTime,
+  getCurrentLocation,
+  getStatusColor,
+  toDateTimeLocalValue,
+} from '../utils/shipment';
 
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
 
-const StatCard = ({ icon, label, number, percentage, isPositive = true }) => (
+const PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100];
+const SEARCH_DEBOUNCE_MS = 300;
+
+const StatCard = ({ icon, label, number, helpText }) => (
   <MotionCard
     variant="elevated"
     whileHover={{ y: -2 }}
@@ -77,20 +109,19 @@ const StatCard = ({ icon, label, number, percentage, isPositive = true }) => (
       <Stat>
         <Flex justify="space-between" align="start">
           <Box>
-            <StatLabel color="gray.600" fontSize="sm" fontWeight="600">
+            <StatLabel color="fg.muted" fontSize="sm" fontWeight="600">
               {label}
             </StatLabel>
-            <StatNumber fontSize="2xl" color="navy.800" fontWeight="bold">
+            <StatNumber fontSize="2xl" color="fg.heading" fontWeight="bold">
               {number}
             </StatNumber>
-            {percentage && (
-              <StatHelpText>
-                <StatArrow type={isPositive ? 'increase' : 'decrease'} />
-                {percentage}%
+            {helpText && (
+              <StatHelpText color="fg.subtle" mb={0}>
+                {helpText}
               </StatHelpText>
             )}
           </Box>
-          <Box p={3} bg="brand.100" rounded="lg">
+          <Box p={3} bg="bg.accent" rounded="lg">
             <Box as={icon} w={6} h={6} color="brand.500" />
           </Box>
         </Flex>
@@ -99,206 +130,230 @@ const StatCard = ({ icon, label, number, percentage, isPositive = true }) => (
   </MotionCard>
 );
 
-const getStatusColor = (status) => {
-  switch (status?.toLowerCase()) {
-    case 'delivered':
-      return 'green';
-    case 'in transit':
-    case 'out for delivery':
-      return 'blue';
-    case 'picked up':
-    case 'processing':
-      return 'orange';
-    case 'delayed':
-      return 'red';
-    default:
-      return 'gray';
-  }
+const buildStats = (stats) => {
+  if (!stats) return [];
+  const { total, byStatus } = stats;
+  const inTransit = (byStatus['in transit'] || 0) + (byStatus['out for delivery'] || 0);
+  const delivered = byStatus.delivered || 0;
+  const delayed = byStatus.delayed || 0;
+  const format = (n) => n.toLocaleString('en-IN');
+  return [
+    { icon: FaBoxOpen, label: 'Total Shipments', number: format(total) },
+    { icon: FaTruck, label: 'In Transit', number: format(inTransit), helpText: 'Including out for delivery' },
+    { icon: FaExclamationTriangle, label: 'Delayed', number: format(delayed) },
+    {
+      icon: FaChartLine,
+      label: 'Delivered',
+      number: format(delivered),
+      helpText: total ? `${((delivered / total) * 100).toFixed(1)}% of all shipments` : undefined,
+    },
+  ];
 };
 
-/**
- * Formats a date string into a readable format for display.
- * @param {string} dateStr
- * @returns {string}
- */
-const formatDateTime = (dateStr) => {
-  const d = new Date(dateStr);
-  return isNaN(d.getTime())
-    ? 'N/A'
-    : d.toLocaleString('en-IN', {
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
+const StatusOptions = () =>
+  STATUS_OPTIONS.map(({ value, label }) => (
+    <option key={value} value={value}>{label}</option>
+  ));
+
+const emptyCreateForm = () => ({ trackingNumber: '', status: 'processing', location: '', remarks: '' });
+
+const emptyUpdateForm = (shipment) => ({
+  status: shipment?.status?.toLowerCase() || 'processing',
+  location: getCurrentLocation(shipment) || '',
+  date: toDateTimeLocalValue(),
+  remarks: '',
+});
+
+const escapeCsvValue = (value) => {
+  let text = String(value ?? '');
+  // Prevent spreadsheet formula injection
+  if (/^[=+\-@]/.test(text)) text = `'${text}`;
+  return `"${text.replace(/"/g, '""')}"`;
+};
+
+const downloadCsv = (shipments) => {
+  const header = ['Tracking Number', 'Status', 'Location', 'Last Updated', 'Created'];
+  const rows = shipments.map((s) => [
+    s.trackingNumber,
+    formatStatus(s.status),
+    s.location,
+    formatDateTime(s.updatedAt),
+    formatDateTime(s.createdAt),
+  ]);
+  const csv = [header, ...rows].map((row) => row.map(escapeCsvValue).join(',')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `shipments-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
 };
 
 const AdminDashboard = () => {
   const [shipments, setShipments] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [loadError, setLoadError] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedShipment, setSelectedShipment] = useState(null);
-  const [formData, setFormData] = useState({
-    trackingNumber: '',
-    status: 'processing',
-    location: '',
-    updateData: {
-      date: new Date().toISOString().split('T')[0],
-      time: new Date().toLocaleTimeString(),
-      location: '',
-      status: '',
-      remarks: ''
-    }
-  });
-  // Pagination state
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [selectedShipment, setSelectedShipment] = useState(null);
+  const [shipmentToDelete, setShipmentToDelete] = useState(null);
+  const [createForm, setCreateForm] = useState(emptyCreateForm);
+  const [updateForm, setUpdateForm] = useState(emptyUpdateForm);
+  const [submitting, setSubmitting] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const latestRequest = useRef(0);
+  const cancelDeleteRef = useRef();
 
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
   const { isOpen: isUpdateOpen, onOpen: onUpdateOpen, onClose: onUpdateClose } = useDisclosure();
   const { isOpen: isViewOpen, onOpen: onViewOpen, onClose: onViewClose } = useDisclosure();
-  
+
   const toast = useToast();
   const navigate = useNavigate();
 
-  const stats = [
-    { icon: FaBoxOpen, label: 'Total Shipments', number: '1,234', percentage: 12, isPositive: true },
-    { icon: FaTruck, label: 'In Transit', number: '456', percentage: 8, isPositive: true },
-    { icon: FaUsers, label: 'Active Customers', number: '890', percentage: 15, isPositive: true },
-    { icon: FaChartLine, label: 'Delivery Rate', number: '99.2%', percentage: 2, isPositive: true },
-  ];
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const queryParams = {
+    q: searchTerm || undefined,
+    status: statusFilter === 'all' ? undefined : statusFilter,
+  };
 
+  // Debounce search so we don't query on every keystroke
   useEffect(() => {
-    // Check authentication
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-    fetchShipments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate, page, limit]);
+    const timer = setTimeout(() => {
+      setSearchTerm(searchInput.trim());
+      setPage(1);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
-  const fetchShipments = async () => {
+  const fetchShipments = useCallback(async () => {
+    const requestId = ++latestRequest.current;
     setLoading(true);
     try {
-      // Pass page and limit as query params
       const response = await fetchAllShipments({
-        params: { page, limit },
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        page,
+        limit,
+        q: searchTerm || undefined,
+        status: statusFilter === 'all' ? undefined : statusFilter,
       });
-      setShipments(response.data);
+      if (requestId !== latestRequest.current) return;
+      setShipments(response.data.shipments);
+      setTotal(response.data.total);
+      setLoadError('');
     } catch (error) {
+      if (requestId !== latestRequest.current) return;
       console.error('Error fetching shipments:', error);
-      toast({
-        title: 'API Not Available',
-        description: 'Backend API "/admin/shipments" not found. Using mock data for demonstration.',
-        status: 'warning',
-        duration: 4000,
-        isClosable: true,
-      });
-      // For demo purposes, using mock data
-      setShipments([
-        {
-          _id: '1',
-          trackingNumber: 'SH2025001',
-          status: 'delivered',
-          location: 'Mumbai',
-          createdAt: new Date().toISOString(),
-          updates: [
-            { date: '2025-01-20', time: '10:30 AM', location: 'Mumbai', status: 'Package Delivered', remarks: 'Delivered to recipient' }
-          ]
-        },
-        {
-          _id: '2',
-          trackingNumber: 'SH2025002',
-          status: 'in transit',
-          location: 'Delhi',
-          createdAt: new Date().toISOString(),
-          updates: [
-            { date: '2025-01-20', time: '08:45 AM', location: 'Delhi', status: 'In Transit', remarks: 'Package on the way' }
-          ]
-        }
-      ]);
+      setLoadError(getErrorMessage(error, 'Failed to load shipments.'));
     } finally {
-      setLoading(false);
+      if (requestId === latestRequest.current) {
+        setLoading(false);
+        setHasLoaded(true);
+      }
     }
+  }, [page, limit, searchTerm, statusFilter]);
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const response = await fetchShipmentStats();
+      setStats(response.data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  }, []);
+
+  const refresh = () => {
+    fetchShipments();
+    fetchStats();
+  };
+
+  useEffect(() => {
+    fetchShipments();
+  }, [fetchShipments]);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  // If the current page no longer exists (e.g. after deleting its last row), step back
+  useEffect(() => {
+    if (hasLoaded && page > totalPages) setPage(totalPages);
+  }, [hasLoaded, page, totalPages]);
+
+  const showError = (title, error, fallback) => {
+    toast({
+      title,
+      description: getErrorMessage(error, fallback),
+      status: 'error',
+      duration: 5000,
+      isClosable: true,
+    });
+  };
+
+  const openCreateModal = () => {
+    setCreateForm(emptyCreateForm());
+    onCreateOpen();
   };
 
   const handleCreateShipment = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
-  await addShipment(formData, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-      
+      const response = await addShipment(createForm);
       toast({
         title: 'Shipment Created',
-        description: 'New shipment has been created successfully',
+        description: `Shipment ${response.data.trackingNumber} has been created.`,
         status: 'success',
         duration: 3000,
         isClosable: true,
       });
-      
       onCreateClose();
-      fetchShipments();
-      resetForm();
+      refresh();
     } catch (error) {
       console.error('Error creating shipment:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to create shipment. Please try again.',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
+      showError('Could not create shipment', error, 'Failed to create shipment. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleUpdateShipment = async (e) => {
     e.preventDefault();
+    const eventDate = new Date(updateForm.date);
+    if (Number.isNaN(eventDate.getTime())) {
+      toast({ title: 'Please enter a valid date and time', status: 'warning', duration: 3000, isClosable: true });
+      return;
+    }
+    setSubmitting(true);
     try {
       await updateShipment(selectedShipment.trackingNumber, {
-        status: formData.status,
-        updateData: formData.updateData
-      }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-      
+        status: updateForm.status,
+        updateData: {
+          date: eventDate.toISOString(),
+          location: updateForm.location,
+          remarks: updateForm.remarks,
+        },
+      });
       toast({
         title: 'Shipment Updated',
-        description: 'Shipment status has been updated successfully',
+        description: `Shipment ${selectedShipment.trackingNumber} has been updated.`,
         status: 'success',
         duration: 3000,
         isClosable: true,
       });
-      
       onUpdateClose();
-      fetchShipments();
-      resetForm();
+      refresh();
     } catch (error) {
       console.error('Error updating shipment:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update shipment. Please try again.',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
+      showError('Could not update shipment', error, 'Failed to update shipment. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      trackingNumber: '',
-      status: 'processing',
-      location: '',
-      updateData: {
-        date: new Date().toISOString().split('T')[0],
-        time: new Date().toLocaleTimeString(),
-        location: '',
-  status: '',
-        remarks: ''
-      }
-    });
   };
 
   const handleViewShipment = (shipment) => {
@@ -308,21 +363,15 @@ const AdminDashboard = () => {
 
   const handleEditShipment = (shipment) => {
     setSelectedShipment(shipment);
-    setFormData({
-      ...formData,
-      status: shipment.status,
-      updateData: {
-        ...formData.updateData,
-        location: shipment.location
-      }
-    });
+    setUpdateForm(emptyUpdateForm(shipment));
     onUpdateOpen();
   };
 
-  const handleDeleteShipment = async (shipment) => {
-    if (!window.confirm(`Are you sure you want to delete shipment ${shipment.trackingNumber}?`)) return;
+  const handleDeleteShipment = async () => {
+    const shipment = shipmentToDelete;
+    setSubmitting(true);
     try {
-      await deleteShipment(shipment.trackingNumber, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      await deleteShipment(shipment.trackingNumber);
       toast({
         title: 'Shipment Deleted',
         description: `Shipment ${shipment.trackingNumber} has been deleted.`,
@@ -330,51 +379,51 @@ const AdminDashboard = () => {
         duration: 3000,
         isClosable: true,
       });
-      fetchShipments();
+      setShipmentToDelete(null);
+      refresh();
     } catch (error) {
       console.error('Error deleting shipment:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete shipment. Please try again.',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
+      showError('Could not delete shipment', error, 'Failed to delete shipment. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const filteredShipments = shipments
-    .filter(shipment => {
-      const matchesSearch = shipment.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || shipment.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) => {
-      // Prefer updatedAt, fallback to createdAt
-      const dateA = new Date(a.updatedAt || a.createdAt);
-      const dateB = new Date(b.updatedAt || b.createdAt);
-      return dateB - dateA; // Descending (latest first)
-    });
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const response = await fetchAllShipments({ ...queryParams, limit: 'all' });
+      downloadCsv(response.data.shipments);
+    } catch (error) {
+      console.error('Error exporting shipments:', error);
+      showError('Export failed', error, 'Failed to export shipments. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    clearToken();
     navigate('/login');
   };
 
-  const bg = useColorModeValue('gray.50', 'gray.900');
-  const textColor = useColorModeValue('gray.600', 'gray.300');
-  if (loading) {
+  if (!hasLoaded) {
     return (
-      <Box bg={bg} minH="100vh" display="flex" alignItems="center" justifyContent="center">
+      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
         <VStack spacing={4}>
           <Spinner size="xl" color="brand.500" />
-          <Text color={textColor}>Loading dashboard...</Text>
+          <Text color="fg.muted">Loading dashboard...</Text>
         </VStack>
       </Box>
     );
   }
+
+  const firstRow = total === 0 ? 0 : (page - 1) * limit + 1;
+  const lastRow = Math.min(page * limit, total);
+  const hasFilters = !!searchTerm || statusFilter !== 'all';
+
   return (
-    <Box bg={bg} minH="100vh">
+    <Box minH="100vh">
       <Container maxW="7xl" py={8}>
         <MotionBox
           initial={{ opacity: 0, y: 20 }}
@@ -385,121 +434,139 @@ const AdminDashboard = () => {
             {/* Header */}
             <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
               <VStack align="start" spacing={1}>
-                <Heading fontSize="2xl" color="navy.800">
+                <Heading fontSize="2xl" color="fg.heading">
                   Admin Dashboard
                 </Heading>
-                <Text color="gray.600">
+                <Text color="fg.muted">
                   Manage shipments and track deliveries
                 </Text>
               </VStack>
               <HStack spacing={3}>
-                <Button
-                  leftIcon={<FaPlus />}
-                  onClick={onCreateOpen}
-                  size="sm"
-                >
+                <Button leftIcon={<FaPlus />} onClick={openCreateModal} size="sm">
                   Add Shipment
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleLogout}
-                  size="sm"
-                >
+                <Button variant="outline" onClick={handleLogout} size="sm">
                   Logout
                 </Button>
               </HStack>
             </Flex>
 
             {/* Stats */}
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6}>
-              {stats.map((stat, index) => (
-                <MotionBox
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <StatCard {...stat} />
-                </MotionBox>
-              ))}
-            </SimpleGrid>
+            {stats && (
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6}>
+                {buildStats(stats).map((stat, index) => (
+                  <MotionBox
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <StatCard {...stat} />
+                  </MotionBox>
+                ))}
+              </SimpleGrid>
+            )}
 
             {/* Filters and Actions */}
             <Card variant="elevated">
               <CardBody>
                 <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
-                  <HStack spacing={4} flex={1}>
-                    <Input
-                      placeholder="Search by tracking number..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      maxW="300px"
-                      leftElement={<FaSearch />}
-                    />
+                  <Flex gap={4} flex={1} wrap="wrap">
+                    <InputGroup maxW={{ base: 'full', md: '300px' }}>
+                      <InputLeftElement pointerEvents="none" color="fg.subtle">
+                        <FaSearch />
+                      </InputLeftElement>
+                      <Input
+                        placeholder="Search by tracking number..."
+                        aria-label="Search by tracking number"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                      />
+                    </InputGroup>
                     <Select
+                      aria-label="Filter by status"
                       value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
+                      onChange={(e) => {
+                        setStatusFilter(e.target.value);
+                        setPage(1);
+                      }}
                       maxW="200px"
                     >
                       <option value="all">All Status</option>
-                      <option value="processing">Processing</option>
-                      <option value="picked up">Picked Up</option>
-                      <option value="in transit">In Transit</option>
-                      <option value="out for delivery">Out for Delivery</option>
-                      <option value="delivered">Delivered</option>
-                      <option value="delayed">Delayed</option>
+                      <StatusOptions />
                     </Select>
-                    {/* Limit selector */}
                     <Select
+                      aria-label="Shipments per page"
                       value={limit}
-                      onChange={e => {
+                      onChange={(e) => {
                         setLimit(Number(e.target.value));
                         setPage(1); // Reset to first page when limit changes
                       }}
                       maxW="120px"
                     >
-                      <option value={5}>5 / page</option>
-                      <option value={10}>10 / page</option>
-                      <option value={20}>20 / page</option>
-                      <option value={50}>50 / page</option>
-                      <option value={100}>100 / page</option>
+                      {PAGE_SIZE_OPTIONS.map((size) => (
+                        <option key={size} value={size}>{size} / page</option>
+                      ))}
                     </Select>
-                  </HStack>
-                  <Button leftIcon={<FaDownload />} variant="outline" size="sm">
-                    Export
+                  </Flex>
+                  <Button
+                    leftIcon={<FaDownload />}
+                    variant="outline"
+                    size="sm"
+                    onClick={handleExport}
+                    isLoading={exporting}
+                    loadingText="Exporting"
+                    isDisabled={total === 0}
+                  >
+                    Export CSV
                   </Button>
                 </Flex>
               </CardBody>
             </Card>
 
+            {loadError && (
+              <Alert status="error" rounded="lg">
+                <AlertIcon />
+                <AlertDescription flex={1}>{loadError}</AlertDescription>
+                <Button size="sm" onClick={refresh} isLoading={loading}>
+                  Retry
+                </Button>
+              </Alert>
+            )}
+
             {/* Shipments Table */}
             <Card variant="elevated">
               <CardHeader>
-                <Heading size="md" color="navy.800">
-                  Recent Shipments
-                </Heading>
+                <HStack justify="space-between">
+                  <Heading size="md" color="fg.heading">
+                    Recent Shipments
+                  </Heading>
+                  {loading && <Spinner size="sm" color="brand.500" />}
+                </HStack>
               </CardHeader>
               <CardBody p={0}>
-                {filteredShipments.length === 0 ? (
+                {shipments.length === 0 ? (
                   <Box p={8} textAlign="center">
-                    <Text color="gray.500">No shipments found</Text>
+                    <Text color="fg.subtle">
+                      {hasFilters ? 'No shipments match your filters' : 'No shipments yet'}
+                    </Text>
                   </Box>
                 ) : (
-                  <>
+                  <TableContainer opacity={loading ? 0.6 : 1} transition="opacity 0.2s">
                     <Table variant="simple">
-                      <Thead bg="gray.50">
+                      <Thead bg="bg.muted">
                         <Tr>
                           <Th>Tracking Number</Th>
                           <Th>Status</Th>
                           <Th>Location</Th>
-                          <Th>Last Updated at</Th>
+                          <Th>Last Updated</Th>
                           <Th>Actions</Th>
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {filteredShipments.map((shipment) => (
-                          <Tr key={shipment._id} _hover={{ bg: 'gray.50' }}>
-                            <Td fontWeight="600" color="navy.800">
+                        {shipments.map((shipment) => (
+                          <Tr key={shipment._id} _hover={{ bg: 'bg.muted' }}>
+                            <Td fontWeight="600" color="fg.heading">
                               {shipment.trackingNumber}
                             </Td>
                             <Td>
@@ -508,14 +575,15 @@ const AdminDashboard = () => {
                                 variant="subtle"
                                 px={2}
                                 py={1}
+                                textTransform="none"
                               >
-                                {shipment.status?.toUpperCase()}
+                                {formatStatus(shipment.status)}
                               </Badge>
                             </Td>
-                            <Td color="gray.600">
-                              {shipment.location}
+                            <Td color="fg.muted">
+                              {getCurrentLocation(shipment)}
                             </Td>
-                            <Td color="gray.600">
+                            <Td color="fg.muted">
                               {formatDateTime(shipment.updatedAt || shipment.createdAt)}
                             </Td>
                             <Td>
@@ -525,23 +593,18 @@ const AdminDashboard = () => {
                                   icon={<FaEllipsisV />}
                                   variant="ghost"
                                   size="sm"
+                                  aria-label={`Actions for ${shipment.trackingNumber}`}
                                 />
                                 <MenuList>
-                                  <MenuItem
-                                    icon={<FaEye />}
-                                    onClick={() => handleViewShipment(shipment)}
-                                  >
+                                  <MenuItem icon={<FaEye />} onClick={() => handleViewShipment(shipment)}>
                                     View Details
                                   </MenuItem>
-                                  <MenuItem
-                                    icon={<FaEdit />}
-                                    onClick={() => handleEditShipment(shipment)}
-                                  >
+                                  <MenuItem icon={<FaEdit />} onClick={() => handleEditShipment(shipment)}>
                                     Update Status
                                   </MenuItem>
                                   <MenuItem
-                                    icon={<FaBoxOpen />}
-                                    onClick={() => handleDeleteShipment(shipment)}
+                                    icon={<FaTrash />}
+                                    onClick={() => setShipmentToDelete(shipment)}
                                     color="red.500"
                                   >
                                     Delete Shipment
@@ -553,23 +616,26 @@ const AdminDashboard = () => {
                         ))}
                       </Tbody>
                     </Table>
-                    {/* Pagination Controls */}
-                    <Flex justify="flex-end" align="center" p={4} gap={2}>
-                      {page > 1 && (
-                        <Button size="sm" onClick={() => setPage(page - 1)}>
-                          Prev
-                        </Button>
-                      )}
-                      <Text fontSize="sm" color="gray.600" mx={2}>
-                        Page {page}
+                  </TableContainer>
+                )}
+                {/* Pagination Controls */}
+                {total > 0 && (
+                  <Flex justify="space-between" align="center" p={4} gap={2} wrap="wrap">
+                    <Text fontSize="sm" color="fg.muted">
+                      Showing {firstRow}–{lastRow} of {total}
+                    </Text>
+                    <HStack>
+                      <Button size="sm" onClick={() => setPage(page - 1)} isDisabled={page <= 1 || loading}>
+                        Prev
+                      </Button>
+                      <Text fontSize="sm" color="fg.muted" mx={2}>
+                        Page {page} of {totalPages}
                       </Text>
-                      {shipments.length === limit && (
-                        <Button size="sm" onClick={() => setPage(page + 1)}>
-                          Next
-                        </Button>
-                      )}
-                    </Flex>
-                  </>
+                      <Button size="sm" onClick={() => setPage(page + 1)} isDisabled={page >= totalPages || loading}>
+                        Next
+                      </Button>
+                    </HStack>
+                  </Flex>
                 )}
               </CardBody>
             </Card>
@@ -589,30 +655,38 @@ const AdminDashboard = () => {
                   <FormControl isRequired>
                     <FormLabel>Tracking Number</FormLabel>
                     <Input
-                      value={formData.trackingNumber}
-                      onChange={(e) => setFormData({...formData, trackingNumber: e.target.value})}
+                      value={createForm.trackingNumber}
+                      onChange={(e) => setCreateForm({ ...createForm, trackingNumber: e.target.value })}
                       placeholder="Enter tracking number"
+                      autoCapitalize="characters"
+                      autoComplete="off"
                     />
+                    <FormHelperText>Saved in uppercase; must be unique.</FormHelperText>
                   </FormControl>
                   <FormControl isRequired>
                     <FormLabel>Status</FormLabel>
                     <Select
-                      value={formData.status}
-                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                      value={createForm.status}
+                      onChange={(e) => setCreateForm({ ...createForm, status: e.target.value })}
                     >
-                      <option value="processing">Processing</option>
-                      <option value="picked up">Picked Up</option>
-                      <option value="in transit">In Transit</option>
-                      <option value="out for delivery">Out for Delivery</option>
-                      <option value="delivered">Delivered</option>
+                      <StatusOptions />
                     </Select>
                   </FormControl>
                   <FormControl isRequired>
                     <FormLabel>Location</FormLabel>
                     <Input
-                      value={formData.location}
-                      onChange={(e) => setFormData({...formData, location: e.target.value})}
+                      value={createForm.location}
+                      onChange={(e) => setCreateForm({ ...createForm, location: e.target.value })}
                       placeholder="Enter current location"
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>Remarks</FormLabel>
+                    <Textarea
+                      value={createForm.remarks}
+                      onChange={(e) => setCreateForm({ ...createForm, remarks: e.target.value })}
+                      placeholder="Optional note shown on the first timeline entry"
+                      rows={2}
                     />
                   </FormControl>
                 </VStack>
@@ -621,7 +695,7 @@ const AdminDashboard = () => {
                 <Button variant="ghost" mr={3} onClick={onCreateClose}>
                   Cancel
                 </Button>
-                <Button type="submit">Create Shipment</Button>
+                <Button type="submit" isLoading={submitting}>Create Shipment</Button>
               </ModalFooter>
             </form>
           </ModalContent>
@@ -631,7 +705,14 @@ const AdminDashboard = () => {
         <Modal isOpen={isUpdateOpen} onClose={onUpdateClose} size="lg">
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Update Shipment Status</ModalHeader>
+            <ModalHeader>
+              Update Shipment
+              {selectedShipment && (
+                <Text fontSize="sm" fontWeight="normal" color="fg.muted">
+                  {selectedShipment.trackingNumber}
+                </Text>
+              )}
+            </ModalHeader>
             <ModalCloseButton />
             <form onSubmit={handleUpdateShipment}>
               <ModalBody>
@@ -639,48 +720,38 @@ const AdminDashboard = () => {
                   <FormControl isRequired>
                     <FormLabel>Status</FormLabel>
                     <Select
-                      value={formData.status}
-                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                      value={updateForm.status}
+                      onChange={(e) => setUpdateForm({ ...updateForm, status: e.target.value })}
                     >
-                      <option value="processing">Processing</option>
-                      <option value="picked up">Picked Up</option>
-                      <option value="in transit">In Transit</option>
-                      <option value="out for delivery">Out for Delivery</option>
-                      <option value="delivered">Delivered</option>
-                      <option value="delayed">Delayed</option>
+                      <StatusOptions />
                     </Select>
                   </FormControl>
                   <FormControl isRequired>
                     <FormLabel>Location</FormLabel>
                     <Input
-                      value={formData.updateData.location}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        updateData: {...formData.updateData, location: e.target.value}
-                      })}
+                      value={updateForm.location}
+                      onChange={(e) => setUpdateForm({ ...updateForm, location: e.target.value })}
                       placeholder="Enter location"
                     />
                   </FormControl>
                   <FormControl isRequired>
-                    <FormLabel>Status Description</FormLabel>
+                    <FormLabel>Date &amp; Time</FormLabel>
                     <Input
-                      value={formData.updateData.status}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        updateData: {...formData.updateData, status: e.target.value}
-                      })}
-                      placeholder="Enter status description"
+                      type="datetime-local"
+                      value={updateForm.date}
+                      max={toDateTimeLocalValue()}
+                      onChange={(e) => setUpdateForm({ ...updateForm, date: e.target.value })}
                     />
+                    <FormHelperText>
+                      When this happened. Back-dated entries are added to the timeline without changing the current status.
+                    </FormHelperText>
                   </FormControl>
                   <FormControl>
-                    <FormLabel>Remarks</FormLabel>
+                    <FormLabel>Description / Remarks</FormLabel>
                     <Textarea
-                      value={formData.updateData.remarks}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        updateData: {...formData.updateData, remarks: e.target.value}
-                      })}
-                      placeholder="Enter additional remarks"
+                      value={updateForm.remarks}
+                      onChange={(e) => setUpdateForm({ ...updateForm, remarks: e.target.value })}
+                      placeholder="e.g. Arrived at Bhopal sorting hub"
                       rows={3}
                     />
                   </FormControl>
@@ -690,14 +761,14 @@ const AdminDashboard = () => {
                 <Button variant="ghost" mr={3} onClick={onUpdateClose}>
                   Cancel
                 </Button>
-                <Button type="submit">Update Shipment</Button>
+                <Button type="submit" isLoading={submitting}>Update Shipment</Button>
               </ModalFooter>
             </form>
           </ModalContent>
         </Modal>
 
         {/* View Shipment Modal */}
-        <Modal isOpen={isViewOpen} onClose={onViewClose} size="lg">
+        <Modal isOpen={isViewOpen} onClose={onViewClose} size="lg" scrollBehavior="inside">
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>Shipment Details</ModalHeader>
@@ -706,46 +777,39 @@ const AdminDashboard = () => {
               {selectedShipment && (
                 <VStack spacing={4} align="stretch">
                   <Box>
-                    <Text fontSize="sm" color="gray.600" fontWeight="600">TRACKING NUMBER</Text>
+                    <Text fontSize="sm" color="fg.muted" fontWeight="600">TRACKING NUMBER</Text>
                     <Text fontSize="lg" fontWeight="bold">{selectedShipment.trackingNumber}</Text>
                   </Box>
                   <Divider />
-                  <HStack justify="space-between">
+                  <Flex justify="space-between" gap={4} wrap="wrap">
                     <Box>
-                      <Text fontSize="sm" color="gray.600" fontWeight="600">STATUS</Text>
-                      <Badge colorScheme={getStatusColor(selectedShipment.status)} variant="solid">
-                        {selectedShipment.status?.toUpperCase()}
+                      <Text fontSize="sm" color="fg.muted" fontWeight="600">STATUS</Text>
+                      <Badge
+                        colorScheme={getStatusColor(selectedShipment.status)}
+                        variant="solid"
+                        textTransform="none"
+                      >
+                        {formatStatus(selectedShipment.status)}
                       </Badge>
                     </Box>
                     <Box>
-                      <Text fontSize="sm" color="gray.600" fontWeight="600">LOCATION</Text>
-                      <Text fontWeight="600">{selectedShipment.location}</Text>
+                      <Text fontSize="sm" color="fg.muted" fontWeight="600">LOCATION</Text>
+                      <Text fontWeight="600">{getCurrentLocation(selectedShipment)}</Text>
                     </Box>
-                  </HStack>
-                  {selectedShipment.updates && selectedShipment.updates.length > 0 && (
-                    <>
-                      <Divider />
-                      <Box>
-                        <Text fontSize="sm" color="gray.600" fontWeight="600" mb={2}>UPDATES</Text>
-                        <VStack spacing={2} align="stretch">
-                          {selectedShipment.updates.map((update, index) => (
-                            <Box key={index} p={3} bg="gray.50" rounded="lg">
-                              <HStack justify="space-between" mb={1}>
-                                <Text fontSize="sm" fontWeight="600">{update.status}</Text>
-                                <Text fontSize="xs" color="gray.500">{update.date}</Text>
-                              </HStack>
-                              <Text fontSize="xs" color="gray.600">
-                                {update.location} • {update.time}
-                              </Text>
-                              {update.remarks && (
-                                <Text fontSize="xs" color="gray.500" mt={1}>{update.remarks}</Text>
-                              )}
-                            </Box>
-                          ))}
-                        </VStack>
-                      </Box>
-                    </>
-                  )}
+                    <Box>
+                      <Text fontSize="sm" color="fg.muted" fontWeight="600">LAST UPDATED</Text>
+                      <Text fontWeight="600">{formatDateTime(selectedShipment.updatedAt)}</Text>
+                    </Box>
+                  </Flex>
+                  <Divider />
+                  <Box>
+                    <Text fontSize="sm" color="fg.muted" fontWeight="600" mb={2}>TIMELINE</Text>
+                    {selectedShipment.updates?.length > 0 ? (
+                      <TrackingTimeline updates={selectedShipment.updates} animate={false} />
+                    ) : (
+                      <Text fontSize="sm" color="fg.subtle">No tracking events yet.</Text>
+                    )}
+                  </Box>
                 </VStack>
               )}
             </ModalBody>
@@ -754,6 +818,33 @@ const AdminDashboard = () => {
             </ModalFooter>
           </ModalContent>
         </Modal>
+
+        {/* Delete Confirmation */}
+        <AlertDialog
+          isOpen={!!shipmentToDelete}
+          leastDestructiveRef={cancelDeleteRef}
+          onClose={() => !submitting && setShipmentToDelete(null)}
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                Delete Shipment
+              </AlertDialogHeader>
+              <AlertDialogBody>
+                Delete shipment <strong>{shipmentToDelete?.trackingNumber}</strong> and its entire
+                tracking history? This cannot be undone.
+              </AlertDialogBody>
+              <AlertDialogFooter>
+                <Button ref={cancelDeleteRef} variant="ghost" onClick={() => setShipmentToDelete(null)} isDisabled={submitting}>
+                  Cancel
+                </Button>
+                <Button colorScheme="red" bg="red.500" _hover={{ bg: 'red.600' }} onClick={handleDeleteShipment} ml={3} isLoading={submitting}>
+                  Delete
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
       </Container>
     </Box>
   );

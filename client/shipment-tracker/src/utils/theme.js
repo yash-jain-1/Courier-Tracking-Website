@@ -39,6 +39,22 @@ const colors = {
   }
 };
 
+// Color-mode-aware tokens; use these instead of hardcoded light-only colors
+const semanticTokens = {
+  colors: {
+    'fg.heading': { default: 'navy.800', _dark: 'gray.50' },
+    'fg.body': { default: 'gray.700', _dark: 'gray.200' },
+    'fg.muted': { default: 'gray.600', _dark: 'gray.400' },
+    'fg.subtle': { default: 'gray.500', _dark: 'gray.400' },
+    'bg.surface': { default: 'white', _dark: 'gray.800' },
+    'bg.input': { default: 'white', _dark: 'gray.700' },
+    'bg.track': { default: 'gray.200', _dark: 'gray.600' },
+    'bg.muted': { default: 'gray.50', _dark: 'whiteAlpha.50' },
+    'bg.accent': { default: 'brand.100', _dark: 'whiteAlpha.100' },
+    'border.subtle': { default: 'gray.200', _dark: 'gray.600' },
+  },
+};
+
 const fonts = {
   heading: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
   body: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
@@ -69,7 +85,8 @@ const components = {
         borderColor: "brand.500",
         color: "brand.500",
         _hover: {
-          bg: "brand.50",
+          bg: "whiteAlpha.100",
+          _light: { bg: "brand.50" },
           transform: "translateY(-1px)",
         },
       },
@@ -81,7 +98,7 @@ const components = {
         borderRadius: "xl",
         boxShadow: "sm",
         border: "1px solid",
-        borderColor: "gray.200",
+        borderColor: "border.subtle",
         _hover: {
           boxShadow: "md",
           transform: "translateY(-2px)",
@@ -96,11 +113,13 @@ const components = {
         field: {
           bg: "gray.50",
           borderRadius: "lg",
+          _dark: { bg: "gray.700" },
           _hover: {
             bg: "gray.100",
+            _dark: { bg: "gray.600" },
           },
           _focus: {
-            bg: "white",
+            bg: "bg.input",
             borderColor: "brand.500",
             boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)",
           },
@@ -122,6 +141,7 @@ const config = {
 const customTheme = extendTheme({
   config,
   colors,
+  semanticTokens,
   fonts,
   components,
   styles: {

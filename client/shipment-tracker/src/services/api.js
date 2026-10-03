@@ -1,30 +1,37 @@
 // src/services/api.js
-import axios from 'axios';
+import api from '../api/axios';
+import { normalizeTrackingNumber } from '../utils/shipment';
 
-const API_URL = 'https://courier-tracking-website.onrender.com/api'; // Your backend URL
-console.log("API URL:", API_URL);
+const shipmentPath = (trackingNumber) =>
+  `/shipments/${encodeURIComponent(normalizeTrackingNumber(trackingNumber))}`;
 
 // Fetch shipment details
-export const fetchShipment = (trackingNumber) => {
-  return axios.get(`${API_URL}/shipments/${trackingNumber}`);
-};
+export const fetchShipment = (trackingNumber) => api.get(shipmentPath(trackingNumber));
 
 // Admin login
-export const adminLogin = (credentials) => {
-  return axios.post(`${API_URL}/auth/login`, credentials);
-};
+export const adminLogin = (credentials) => api.post('/auth/login', credentials);
 
 // Add a new shipment
-export const addShipment = (shipmentData) => axios.post(`${API_URL}/shipments`, shipmentData);
+export const addShipment = (shipmentData) => api.post('/shipments', shipmentData);
 
-// Update shipment details (add update)
-export const updateShipment = (trackingNumber, updateData) => axios.post(`${API_URL}/shipments/${trackingNumber}/updates`, updateData);
+// Add a tracking event to a shipment
+export const updateShipment = (trackingNumber, updateData) =>
+  api.post(`${shipmentPath(trackingNumber)}/updates`, updateData);
 
-// Fetch all shipments for admin (with pagination support)
-export const fetchAllShipments = (options = {}) => {
-  return axios.get(`${API_URL}/admin/shipments`, options);
+// Fetch shipments for admin: params = { page, limit, q, status }
+export const fetchAllShipments = (params = {}) => api.get('/admin/shipments', { params });
+
+// Shipment counts per status for the admin dashboard
+export const fetchShipmentStats = () => api.get('/admin/shipments/stats');
+
+// Delete a shipment by its exact stored tracking number (admin)
+export const deleteShipment = (trackingNumber) =>
+  api.delete(`/admin/shipments/${encodeURIComponent(trackingNumber)}`);
+
+// Human-readable message from an API error
+export const getErrorMessage = (error, fallback) => {
+  if (error.code === 'ECONNABORTED' || !error.response) {
+    return 'Unable to reach the server. It may be starting up — please try again in a moment.';
+  }
+  return error.response.data?.message || fallback;
 };
-
-// Delete a shipment by tracking number (admin)
-export const deleteShipment = (trackingNumber, config) =>
-  axios.delete(`${API_URL}/admin/shipments/${trackingNumber}`, config);

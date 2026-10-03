@@ -1,3 +1,7 @@
 /node_modules/
-/sever/config/.env
 /client/shipment-tracker/.env
+
+# Environment files (secrets)
+.env
+.env.*
+!.env.example

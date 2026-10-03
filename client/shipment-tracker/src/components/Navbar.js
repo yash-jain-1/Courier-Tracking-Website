@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Flex,
@@ -19,7 +19,8 @@ import {
 import { useColorMode, useColorModeValue } from '@chakra-ui/react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { HamburgerIcon, CloseIcon, ChevronDownIcon } from '@chakra-ui/icons';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
+import { isAuthenticated, clearToken, onAuthChange } from '../utils/auth';
 import { motion } from 'framer-motion';
 import { FaTruck, FaShieldAlt, FaPhone, FaUser } from 'react-icons/fa';
 
@@ -55,16 +56,20 @@ const NavLink = ({ children, to, icon }) => (
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    !!localStorage.getItem('token')
-  );
+  const location = useLocation();
+  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated);
+
+  // Re-check on navigation (catches token expiry) and on login/logout from any tab
+  useEffect(() => {
+    setIsLoggedIn(isAuthenticated());
+  }, [location]);
+  useEffect(() => onAuthChange(() => setIsLoggedIn(isAuthenticated())), []);
   const { colorMode, toggleColorMode } = useColorMode();
   const navBg = useColorModeValue('navy.800', 'gray.900');
   const navText = useColorModeValue('white', 'gray.100');
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsAuthenticated(false);
+    clearToken();
     navigate('/');
   };
 
@@ -130,7 +135,7 @@ const Navbar = () => {
               Contact
             </NavLink>
             
-            {isAuthenticated ? (
+            {isLoggedIn ? (
               <Menu>
                 <MenuButton
                   as={Button}
@@ -142,7 +147,7 @@ const Navbar = () => {
                 >
                   <FaUser size="14" />
                 </MenuButton>
-                <MenuList bg="white" borderColor="gray.200">
+                <MenuList bg="bg.surface" borderColor="border.subtle">
                   <MenuItem
                     as={RouterLink}
                     to="/admin"
@@ -152,7 +157,7 @@ const Navbar = () => {
                   </MenuItem>
                   <MenuItem
                     onClick={handleLogout}
-                    _hover={{ bg: 'red.50', color: 'red.500' }}
+                    _hover={{ bg: 'red.50', color: 'red.500', _dark: { bg: 'whiteAlpha.100', color: 'red.300' } }}
                   >
                     Logout
                   </MenuItem>
@@ -226,7 +231,7 @@ const Navbar = () => {
                 Contact
               </NavLink>
               
-              {isAuthenticated ? (
+              {isLoggedIn ? (
                 <>
                   <NavLink to="/admin" icon={<FaUser size="14" />}>
                     Admin Dashboard
