@@ -49,6 +49,8 @@ const semanticTokens = {
     'bg.surface': { default: 'white', _dark: 'gray.800' },
     'bg.input': { default: 'white', _dark: 'gray.700' },
     'bg.track': { default: 'gray.200', _dark: 'gray.600' },
+    'bg.muted': { default: 'gray.50', _dark: 'whiteAlpha.50' },
+    'bg.accent': { default: 'brand.100', _dark: 'whiteAlpha.100' },
     'border.subtle': { default: 'gray.200', _dark: 'gray.600' },
   },
 };

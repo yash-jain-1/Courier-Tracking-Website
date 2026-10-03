@@ -26,8 +26,9 @@ import {
 import { motion } from 'framer-motion';
 import { ViewIcon, ViewOffIcon, LockIcon} from '@chakra-ui/icons';
 import { FaShieldAlt, FaUserShield } from 'react-icons/fa';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { adminLogin } from '../services/api';
+import { useNavigate, useSearchParams, Link as RouterLink } from 'react-router-dom';
+import { adminLogin, getErrorMessage } from '../services/api';
+import { setToken } from '../utils/auth';
 
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
@@ -39,8 +40,11 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  
+  const [searchParams] = useSearchParams();
+  const [error, setError] = useState(
+    searchParams.get('expired') ? 'Your session has expired. Please sign in again.' : ''
+  );
+
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -71,7 +75,7 @@ const Login = () => {
       });
 
       if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
+        setToken(response.data.token);
         
         toast({
           title: 'Login Successful',
@@ -81,20 +85,16 @@ const Login = () => {
           isClosable: true,
         });
 
-        setTimeout(() => {
-          navigate('/admin');
-        }, 1000);
+        navigate('/admin', { replace: true });
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError(
-        err.response?.data?.message || 
-        'Invalid credentials. Please try again.'
-      );
-      
+      const message = getErrorMessage(err, 'Invalid credentials. Please try again.');
+      setError(message);
+
       toast({
         title: 'Login Failed',
-        description: 'Please check your credentials and try again',
+        description: message,
         status: 'error',
         duration: 4000,
         isClosable: true,
